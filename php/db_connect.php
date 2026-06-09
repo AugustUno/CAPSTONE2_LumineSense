@@ -1,0 +1,156 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'luminesense_db');
+
+$conn = new mysqli(DB_HOST, DB_USER, DB_PASS);
+if ($conn->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'DB connection failed: ' . $conn->connect_error]));
+}
+
+// Create database if it doesn't exist
+$conn->query("CREATE DATABASE IF NOT EXISTS " . DB_NAME . " CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+$conn->select_db(DB_NAME);
+
+// Create tables if they don't exist
+$conn->query("
+    CREATE TABLE IF NOT EXISTS admins (
+        id             INT AUTO_INCREMENT PRIMARY KEY,
+        last_name      VARCHAR(50)  NOT NULL,
+        first_name     VARCHAR(50)  NOT NULL,
+        middle_initial VARCHAR(5)   DEFAULT '',
+        email          VARCHAR(100) NOT NULL UNIQUE,
+        password       VARCHAR(255) NOT NULL,
+        is_verified    TINYINT(1)   DEFAULT 0,
+        otp_code       VARCHAR(6)   DEFAULT NULL,
+        otp_expires_at DATETIME     DEFAULT NULL,
+        created_at     TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+    )
+");
+
+$conn->query("
+    CREATE TABLE IF NOT EXISTS faculty (
+        id             INT AUTO_INCREMENT PRIMARY KEY,
+        last_name      VARCHAR(50)  NOT NULL,
+        first_name     VARCHAR(50)  NOT NULL,
+        middle_initial VARCHAR(5)   DEFAULT '',
+        email          VARCHAR(100) NOT NULL UNIQUE,
+        password       VARCHAR(255) NOT NULL,
+        is_verified    TINYINT(1)   DEFAULT 0,
+        approved_by    INT          DEFAULT NULL,
+        approved_at    TIMESTAMP    NULL DEFAULT NULL,
+        otp_code       VARCHAR(6)   DEFAULT NULL,
+        otp_expires_at DATETIME     DEFAULT NULL,
+        created_at     TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (approved_by) REFERENCES admins(id) ON DELETE SET NULL
+    )
+");
+
+$conn->query("
+    CREATE TABLE IF NOT EXISTS classrooms (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        room_name   VARCHAR(100) NOT NULL,
+        room_size   ENUM('small','medium','large') DEFAULT 'medium',
+        description TEXT         DEFAULT '',
+        created_at  TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+    )
+");
+
+$conn->query("
+    CREATE TABLE IF NOT EXISTS schedules (
+        id           INT AUTO_INCREMENT PRIMARY KEY,
+        classroom_id INT NOT NULL,
+        day_of_week  ENUM('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
+        start_time   TIME NOT NULL,
+        end_time     TIME NOT NULL,
+        created_by   INT NOT NULL,
+        FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
+        FOREIGN KEY (created_by) REFERENCES faculty(id) ON DELETE CASCADE
+    )
+");
+
+$conn->query("
+    CREATE TABLE IF NOT EXISTS lighting_logs (
+        id            INT AUTO_INCREMENT PRIMARY KEY,
+        classroom_id  INT NOT NULL,
+        faculty_id    INT DEFAULT NULL,
+        event_type    ENUM('on','off','security_alert','gesture','schedule') NOT NULL,
+        triggered_by  VARCHAR(100) DEFAULT '',
+        event_time    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
+        FOREIGN KEY (faculty_id)   REFERENCES faculty(id) ON DELETE SET NULL
+    )
+");
+
+$conn->query("
+    CREATE TABLE IF NOT EXISTS extension_requests (
+        id           INT AUTO_INCREMENT PRIMARY KEY,
+        schedule_id  INT NOT NULL,
+        faculty_id   INT NOT NULL,
+        requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        extend_mins  INT DEFAULT 30,
+        status       ENUM('pending','approved','rejected') DEFAULT 'pending',
+        reviewed_by  INT DEFAULT NULL,
+        reviewed_at  TIMESTAMP NULL DEFAULT NULL,
+        FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE CASCADE,
+        FOREIGN KEY (faculty_id)  REFERENCES faculty(id) ON DELETE CASCADE,
+        FOREIGN KEY (reviewed_by) REFERENCES admins(id) ON DELETE SET NULL
+    )
+");
+
+$conn->set_charset('utf8mb4');
+
+// ── Runtime column migrations (safe – only adds if missing) ──────────────────
+// light_status on classrooms (used by dashboard poll + Arduino PIR webhook)
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS light_status ENUM('on','off') DEFAULT 'off'");
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS row1_status ENUM('on','off') DEFAULT 'off'");
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS row2_status ENUM('on','off') DEFAULT 'off'");
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS row3_status ENUM('on','off') DEFAULT 'off'");
+// pir_occupied flag – set by PIR webhook, cleared when occupancy ends
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS pir_occupied TINYINT(1) DEFAULT 0");
+// pir_occupied_since – when occupancy started (drives System Uptime)
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS pir_since TIMESTAMP NULL DEFAULT NULL");
+// extended_until on schedules (used by active-schedule query in faculty-home.php)
+$conn->query("ALTER TABLE schedules ADD COLUMN IF NOT EXISTS extended_until TIME DEFAULT NULL");
+$conn->query("ALTER TABLE schedules ADD COLUMN IF NOT EXISTS created_by INT DEFAULT NULL");
+//pzem live readings on classrooms (updated by api/post_pzem.php)
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS pzem_voltage float DEFAULT NULL");
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS pzem_current float DEFAULT NULL");
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS pzem_power   float DEFAULT NULL");
+$conn->query("ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS pzem_energy  float DEFAULT NULL");
+
+
+//Early adds
+// ── Faculty ID image and AI verification columns ──────────────────────────
+$conn->query("ALTER TABLE faculty ADD COLUMN IF NOT EXISTS id_image VARCHAR(255) DEFAULT NULL");
+$conn->query("ALTER TABLE faculty ADD COLUMN IF NOT EXISTS faculty_id VARCHAR(20) DEFAULT NULL");
+$conn->query("ALTER TABLE faculty ADD COLUMN IF NOT EXISTS ai_match_status ENUM('matched','mismatched','unreadable') DEFAULT NULL");
+$conn->query("ALTER TABLE faculty ADD COLUMN IF NOT EXISTS ai_extracted_name VARCHAR(100) DEFAULT NULL");
+$conn->query("ALTER TABLE faculty ADD COLUMN IF NOT EXISTS ai_confidence_note TEXT DEFAULT NULL");
+
+
+// ── Admin logs table ──────────────────────────────────────────────────────
+$conn->query("
+    CREATE TABLE IF NOT EXISTS admin_logs (
+        id          INT AUTO_INCREMENT PRIMARY KEY,
+        admin_id    INT NOT NULL,
+        action      VARCHAR(100) NOT NULL,
+        target_name VARCHAR(100) DEFAULT '',
+        notes       TEXT DEFAULT '',
+        created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+    )
+");
+
+// ── Admin login logs ──────────────────────────────────────────────────────
+$conn->query("
+    CREATE TABLE IF NOT EXISTS admin_login_logs (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        admin_id   INT NOT NULL,
+        login_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (admin_id) REFERENCES admins(id) ON DELETE CASCADE
+    )
+");

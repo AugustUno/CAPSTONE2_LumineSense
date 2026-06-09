@@ -1,0 +1,700 @@
+.parent-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* REMOVE justify-content: center — this was pushing content up */
+}
+
+.parent-container-index {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.child-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    /* was: center */
+    height: auto;
+    width: 100%;
+}
+
+.landing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    height: auto;
+}
+
+.return-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+
+    a {
+        color: var(--secondary-color-4);
+        font-size: 24px;
+        transition: color 0.3s ease;
+        width: 50px;
+        height: 50px;
+        padding: 5px;
+    }
+
+    a:hover {
+        color: var(--secondary-color-4);
+    }
+}
+
+.return-container:hover {
+    border-color: var(--secondary-color-2);
+    box-shadow: 0 0 8px #ffffffeb;
+}
+
+.registration-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(420px, 90vw);
+    max-width: 420px;
+    padding: 2rem 1.5rem;
+    margin: 6rem auto 2rem;
+    /* push lower so circular image isn't clipped */
+    box-sizing: border-box;
+    overflow: visible;
+    /* ensure circular image can overflow if needed */
+
+    h4 {
+        color: var(--secondary-color-1);
+    }
+
+    input::placeholder {
+        font-style: italic;
+    }
+}
+
+.form-group {
+    min-width: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+    gap: 0.75rem;
+}
+
+.form-group>div {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.form-group>.child-3 {
+    flex: 0 0 90px;
+    max-width: 90px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    form {
+        margin: 0;
+        width: 100%;
+    }
+
+    .form-group form:nth-child(1) {
+        flex: 1;
+    }
+
+    .form-group form:nth-child(2) {
+        flex: 1;
+    }
+
+    .form-group form:nth-child(3) {
+        flex: 0.5;
+    }
+
+    h6 {
+        margin: 0;
+    }
+
+    input {
+        border-color: var(--secondary-color-3);
+    }
+
+    input:hover {
+        border-color: var(--secondary-color-2);
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    input:focus {
+        border-color: var(--secondary-color-2);
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    }
+
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .password-wrapper input {
+        width: 100%;
+        padding-right: 40px;
+    }
+
+    .password-wrapper i {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--secondary-color-3);
+    }
+}
+
+.form-group {
+    min-width: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+}
+
+.submit-container {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+
+    a {
+        color: var(--secondary-color-1);
+        cursor: pointer;
+    }
+}
+
+.submit-container.admin-login {
+    width: 100%;
+
+    button {
+        width: auto;
+        padding: 6px 40px;
+    }
+}
+
+.main-container.homepage {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    padding: 2rem;
+    gap: 3rem;
+
+    .group-container:first-child {
+        flex: 2;
+    }
+
+    .group-container:last-child {
+        flex: 0.5;
+    }
+}
+
+/* Equal-width columns for the 3-column readings page */
+.main-container.homepage.readings .group-container:first-child,
+.main-container.homepage.readings .group-container:last-child,
+.main-container.homepage.readings .group-container {
+    flex: 1 !important;
+}
+
+.main-container.gesture-controls {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 80vh;
+    padding: 2rem;
+    gap: 3rem;
+
+    .group-container:first-child {
+        flex: 2;
+    }
+
+    .group-container:last-child {
+        flex: 0.5;
+    }
+}
+
+.main-container.lightin-status {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 80vh;
+    padding: 2rem;
+    gap: 3rem;
+
+    .group-container:first-child {
+        flex: 2;
+    }
+
+    .group-container:last-child {
+        flex: 0.5;
+    }
+}
+
+.page-shell {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 1rem 1.25rem 2rem;
+}
+
+.topbar {
+    /* border-radius: 28px; NOTE: Do not change for CONSISTENCY*/
+    /* box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22); NOTE: Do not change for CONSISTENCY*/
+    padding: 1.3rem 1.5rem;
+}
+
+.main-container {
+    background-color: #ffffff;
+    border-radius: 15px; /*NOTE: Do not change for CONSISTENCY*/
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.17);
+    padding: 2rem;
+    width: auto;
+    margin: 0px 1.5rem;
+}
+
+.access-icon {
+    font-size: 1rem;
+    color: var(--secondary-color-1);
+}
+
+.faculty-header-bar {
+    background: linear-gradient(135deg, var(--secondary-color-1) 0%, var(--secondary-color-2) 100%);
+    border-radius: 28px;
+    padding: 1.75rem 1.75rem;
+    margin-bottom: 1.75rem;
+}
+
+.faculty-header-bar h2 {
+    color: var(--primary-color);
+}
+
+.faculty-header-bar .faculty-status-label {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.85rem;
+}
+
+.action-btn {
+    width: auto;
+    min-width: 140px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    margin: 0;
+}
+
+.faculty-card {
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(47, 0, 79, 0.18);
+    border: none;
+}
+
+.divider-bottom {
+    border-bottom: 1px solid #eee;
+}
+
+.avatar-large {
+    width: 86px;
+    height: 86px;
+    font-size: 1.6rem;
+    background: #d9d6d6;
+    color: var(--secondary-color-1);
+    border-radius: 50%;
+}
+
+.profile-name {
+    color: var(--secondary-color-1);
+}
+
+.profile-label {
+    color: #666;
+    font-size: 0.88rem;
+}
+
+.faculty-info-card {
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    min-width: 220px;
+}
+
+.faculty-badge {
+    background: #e9d5ff;
+    color: var(--secondary-color-1);
+    border-radius: 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.45rem 1rem;
+}
+
+.faculty-status-text {
+    font-size: 0.8rem;
+}
+
+.access-label {
+    font-size: 0.87rem;
+}
+
+.schedule-row {
+    border-bottom: 1px solid #f0eaf8;
+}
+
+.schedule-row:last-child {
+    border-bottom: none;
+}
+
+.schedule-badge {
+    background: #e9d5ff;
+    color: var(--secondary-color-1);
+    border-radius: 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.35rem 0.95rem;
+}
+
+.schedule-time {
+    font-size: 0.88rem;
+    color: var(--secondary-color-1);
+}
+
+.status-highlight {
+    color: #d4541a;
+    font-weight: 600;
+}
+
+.modal-label {
+    font-size: 0.78rem;
+    color: #888;
+    font-weight: 600;
+}
+
+.clickable-logo {
+    cursor: pointer;
+}
+
+.team-logo {
+    width: 4rem;
+}
+
+.profile-offcanvas-heading {
+    color: var(--secondary-color-1);
+}
+
+.profile-email {
+    word-break: break-all;
+    text-align: center;
+}
+
+.group-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.group-container.recent-activities {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    width: 90%;
+
+    .section-container {
+        padding: 1rem;
+    }
+}
+
+
+.section-container {
+    border-radius: 10px;
+    height: auto;
+    /* was 100% — this caused overflow growth */
+    width: 100%;
+}
+
+
+/* Responsive timer font so large clocks don't overflow their container */
+.section-container .display-1 {
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    line-height: 1;
+    margin: 0;
+}
+
+/* @media (max-width: 992px) {
+    /* on narrower screens, scale the timer down more and stack content */
+.main-container.homepage {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.section-container .display-1 {
+    font-size: clamp(1.6rem, 8vw, 3.5rem);
+}
+
+
+.section-container.recents {
+    border-radius: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+
+.section-container.rooms {
+    border-radius: 10px;
+    min-height: 30vh;
+    max-width: 45vh;
+}
+
+.section-topbar {
+    padding: 10px 15px 10px 0px;
+}
+
+.fit-width.section-container {
+    min-width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.lighting-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: fit-content;
+    border: 5px solid #c6bbcf;
+    border-radius: 10px;
+
+
+    hr {
+        grid-column: 1 / -1;
+        margin: 0;
+        border: 3px solid var(--secondary-color-1);
+    }
+
+    img {
+        width: 8rem;
+        height: 8rem;
+        object-fit: cover;
+    }
+}
+
+div.all-lights-on {
+    background-color: var(--secondary-color-1);
+    width: 4rem;
+    height: 4rem;
+    border-radius: 10px;
+
+    i {
+        color: var(--primary-color);
+        font-size: 3rem;
+    }
+}
+
+div.all-lights-off {
+    background-color: #c6bbcf;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 10px;
+
+    i {
+        color: var(--secondary-color-1);
+        font-size: 3rem;
+    }
+}
+
+h4.bold.on {
+    color: green;
+}
+
+h4.bold.off {
+    color: red;
+}
+
+.activity-list {
+    max-height: 30vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+
+    div {
+        h5 {
+            font-weight: semi-bold;
+        }
+
+        p {
+            font-size: 11px;
+            font-weight: 450;
+        }
+    }
+
+    hr {
+        border: 1px solid var(--secondary-color-1);
+    }
+}
+
+.activity-list.admin {
+    flex: 1;
+    max-height: 35vh;
+}
+
+.activity-list.sensor-readings {
+    max-height: 60vh;
+}
+
+
+.activity-list.gesture-control {
+    max-height: 60vh;
+}
+
+.activity-list.admin-alerts {
+    max-height: 60vh;
+}
+
+.gesture-camera {
+    margin: 5px;
+    border-radius: 5px;
+    min-height: 30vh;
+    background-color: gray;
+
+    img {
+        max-width: 100%;
+        max-height: 45vh;
+        object-fit: cover;
+    }
+
+    button {
+        max-width: 20vh;
+        margin: 2px;
+        padding: 2px 0.5rem;
+        border: 5px;
+        background-color: var(--primary-color);
+        border-radius: 3px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: var(--secondary-color-2);
+        color: var(--secondary-color-1);
+        transition: background-color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+            color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+            transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+            box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    button:hover {
+        background-color: var(--secondary-color-1);
+        color: var(--primary-color);
+        transform: scale(1.02);
+    }
+}
+
+.activity-list.admin-recents {
+    max-height: 60vh;
+    width: 100%;
+
+    .room {
+        i {
+            font-size: 2.5rem;
+        }
+
+        .bi-box {
+            font-size: 5rem;
+        }
+
+        h4 {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        p {
+            color: gray;
+            font-size: 0.8rem;
+        }
+
+        span {
+            font-weight: bold;
+        }
+    }
+
+}
+
+.gauge-container {
+    max-height: 55vh;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.status-cards {
+    i {
+        font-size: 3.5rem;
+        font-weight: bolder;
+    }
+
+    h1 {
+        font-size: 4rem;
+        margin: 0;
+    }
+
+    h6 {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .bi-box,
+    .fa-person-shelter {
+        color: green;
+    }
+
+    .bi-lightbulb {
+        color: orange;
+    }
+
+    .bi-info-circle {
+        color: red;
+    }
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    height: 50px;
+    border-radius: 30px;
+    padding-left: 35px;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+/* end styles */

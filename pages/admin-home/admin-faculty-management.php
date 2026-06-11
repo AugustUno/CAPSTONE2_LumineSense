@@ -1,6 +1,7 @@
 <?php
 $page_title = "Faculty Management";
 require_once '../../php/includes/admin-head.php';
+
 /** @var string $initials */
 /** @var string $admin_name */
 /** @var string $admin_email */
@@ -108,9 +109,9 @@ $conn->close();
 
                 <div class="group-container">
                     <!-- Faculty Directory -->
-                    <div class="card border-0 shadow-sm p-4 bg-white">
+                    <div class="card border-0 shadow-sm p-4 bg-white w-100">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="bold mb-0"><i class="fa-solid fa-users text-primary me-2"></i> Complete Faculty Directory</h5>
+                            <h2 class="bold mb-0"><i class="bi bi-people me-2"></i> Complete Faculty Directory</h2>
                             <div class="btn-group btn-group-sm" role="group">
                                 <button type="button" class="btn btn-outline-secondary active" onclick="filterList('all')">All Records</button>
                                 <button type="button" class="btn btn-outline-success" onclick="filterList('approved')">Approved</button>
@@ -133,7 +134,7 @@ $conn->close();
                                             <div>
                                                 <a href="admin-faculty-card.php?id=<?= $faculty['id'] ?>"
                                                     class="btn btn-sm btn-outline-primary">
-                                                    <i class="fa-solid fa-eye me-1"></i>
+                                                    <i class="bi bi-eye me-1"></i>
                                                 </a>
                                             </div>
                                         </div>

@@ -1,4 +1,5 @@
 <?php
+$page_title = 'Report Management';
 require_once '../../php/includes/admin-head.php';
 require_once '../../php/handlers/admin-handlers.php';
 

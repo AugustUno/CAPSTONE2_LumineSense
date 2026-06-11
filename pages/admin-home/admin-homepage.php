@@ -138,7 +138,7 @@ require_once '../../php/includes/admin-head.php';
                                 <h2 class="bold">System Status</h2>
                             </div>
                         </div>
-                        <div class="activity-list px-2 gap-2 max-width">
+                        <div class="activity-list system-status px-2 gap-2 max-width">
                             <?php
                             $statuses = [
                                 ['label' => 'Server',         'ok' => $db_ok,            'ok_text' => 'Connected',           'fail_text' => 'Disconnected'],
@@ -150,7 +150,7 @@ require_once '../../php/includes/admin-head.php';
                             foreach ($statuses as $s): ?>
                                 <div class="d-flex justify-content-between align-items-center py-1" style="border-bottom:1px solid #eee;">
                                     <h5 class="mb-0" style="font-size:13px;"><?= $s['label'] ?></h5>
-                                    <span style="font-size:11px; padding:2px 10px; border-radius:20px; font-weight:600;
+                                    <span style="font-size:12px; padding:2px 10px; border-radius:20px; font-weight:600;
                                         background:<?= $s['ok'] ? '#d1e7dd' : '#f8d7da' ?>;
                                         color:<?= $s['ok'] ? '#0f5132' : '#842029' ?>;">
                                         <?= $s['ok'] ? $s['ok_text'] : $s['fail_text'] ?>
@@ -159,7 +159,7 @@ require_once '../../php/includes/admin-head.php';
                             <?php endforeach; ?>
                             <div class="d-flex justify-content-between align-items-center py-1">
                                 <h5 class="mb-0" style="font-size:13px;">System Uptime</h5>
-                                <span style="font-size:11px; color:var(--muted);" id="uptime-display">Calculating...</span>
+                                <span style="font-size:13px; color:var(--muted-dark);" id="uptime-display">Calculating...</span>
                             </div>
                         </div>
                     </div>
@@ -463,7 +463,7 @@ require_once '../../php/includes/admin-head.php';
                                     ${on ? 'ON' : 'OFF'}
                                 </span>
                             </div>
-                            <p class="room-size mb-0" style="font-size:13.5px; color:var(--muted);">
+                            <p class="room-size mb-0" style="font-size:13.5px; color:var(--muted-dark);">
                             Room size:
                                 <span>${c.room_size.charAt(0).toUpperCase() + c.room_size.slice(1)}</span> room
                             </p>
@@ -487,12 +487,13 @@ require_once '../../php/includes/admin-head.php';
                                 <p class="tl-action" style="font-size:14px; font-weight: 600;">
                                     ${iconData.label}
                                     ${log.room_name ? '&mdash; <span style="color:var(--secondary-color-3);">' + log.room_name + '</span>' : ''}
-                                </p>
-                                <div class="tl-meta" style="flex-wrap: wrap; row-gap: 2px;">
-                                    <span><i class="bi bi-clock"></i> ${formatTime(log.event_time)}</span><br>
-                                    ${log.admin_name ? '<span><i class="bi bi-person"></i> ' + log.admin_name + '</span>' : ''}
-                                    ${(!log.admin_name && log.triggered_by) ? '<span><i class="bi bi-person"></i> ' + log.triggered_by + '</span>' : ''}
                                     <span class="tl-type-badge" style="background:${iconData.typeBg}; color:${iconData.typeClr};">${iconData.typeLabel}</span>
+                                </p>
+                                <div class="tl-meta" style="display: flex; flex-wrap: wrap; row-gap: 4px; width: 100%;">
+                                    <span style="width: 100%;"><i class="bi bi-clock"></i> ${formatTime(log.event_time)}</span>
+                                    ${log.admin_name ? '<span style="width: 100%; margin-top: 2px;"><i class="bi bi-person"></i> ' + log.admin_name + '</span>' : ''}
+                                    ${(!log.admin_name && log.triggered_by) ? '<span style="width: 100%; margin-top: 2px;"><i class="bi bi-person"></i> ' + log.triggered_by + '</span>' : ''}
+                                    
                                 </div>
                                 ${iconData.notes ? '<span class="tl-notes"><i class="bi bi-chat-left-text me-1"></i>' + iconData.notes + '</span>' : ''}
                             </div>

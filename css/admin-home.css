@@ -52,7 +52,7 @@
 
 .stat-card .stat-label {
     font-size: 0.80rem;
-    color: var(--dark-muted);
+    color: var(--muted-dark);
     margin: 0;
     line-height: 1.3;
 }

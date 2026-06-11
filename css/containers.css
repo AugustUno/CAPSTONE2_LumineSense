@@ -557,6 +557,10 @@ h4.bold.off {
     }
 }
 
+.activity-list.system-status {
+    max-height: 39vh;
+}
+
 .activity-list.admin {
     flex: 1;
     max-height: 35vh;

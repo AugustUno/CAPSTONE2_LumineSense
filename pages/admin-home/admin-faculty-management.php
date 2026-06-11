@@ -109,9 +109,9 @@ $conn->close();
 
                 <div class="group-container">
                     <!-- Faculty Directory -->
-                    <div class="card border-0 shadow-sm p-4 bg-white w-100">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h2 class="bold mb-0"><i class="bi bi-people me-2"></i> Complete Faculty Directory</h2>
+                    <div class="faculty-directory card border-0 shadow-sm p-4 bg-white w-100">
+                        <div class="faculty-directory-container d-flex flex-column justify-content-center align-items-center p-3 mb-3">
+                            <h2 class="bold mb-0"><i class="bi bi-people mb-3"></i> Faculty Directory</h2>
                             <div class="btn-group btn-group-sm" role="group">
                                 <button type="button" class="btn btn-outline-secondary active" onclick="filterList('all')">All Records</button>
                                 <button type="button" class="btn btn-outline-success" onclick="filterList('approved')">Approved</button>

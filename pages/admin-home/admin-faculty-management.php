@@ -68,9 +68,9 @@ $conn->close();
                 <div class="group-container">
                     <!-- Stats cards -->
                     <div style="background-color:#f8f9fa;" class="section-container py-4">
-                        <div class="stat-row">
+                        <div class="stat-row gap-3">
                             <div class="stat-card">
-                                <span class="stat-icon"><i class="bi bi-door-open" style="font-size:2rem;color:var(--secondary-color-2);"></i></span>
+                                <span class="stat-icon"><i class="bi bi-diagram-3" style="font-size:2rem;color:var(--secondary-color-2);"></i></span>
                                 <div>
                                     <div class="stat-value"><?= $total_rooms ?></div>
                                     <p class="stat-label">Total<br>Departments</p>
@@ -96,17 +96,102 @@ $conn->close();
                     <div style="background-color:#f8f9fa;" class="section-container system-status">
                         <div class="section-topbar d-flex my-auto gap-1 align-items-center justify-content-between">
                             <div class="d-flex mx-2 align-items-start">
-                                <h2 class="bold">Departments</h2>
+                                <h2 class="bold"><i class="bi bi-diagram-3 me-2"></i>Departments</h2>
                             </div>
                             <div class="d-flex mx-2 align-items-end">
-                                <button class="light mx-2" onclick="dissolve('admin-reports.php?tab=activity')">Details</button>
+                                <button class="medium mx-2 w-100">Add Department</button>
+                                <button class="light mx-2" onclick="dissolve('admin-reports.php?tab=activity')">View All</button>
                             </div>
                         </div>
-                        <div>
-                            <!--Department see figma for full styling-->
+                        <div class="departments-scroll-container gap-2" style="max-height: 100vh; overflow-y: auto;">
+
+                            <div class="department-card">
+                                <div class="department-header d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-start">
+                                        <h3 class="bold">Magical Transfiguration Department</h3>
+                                    </div>
+                                    <div class="d-flex align-items-end">
+                                        <button class="btn-icon btn-icon-view d-inline-flex align-items-center justify-content-center"
+                                            onclick="window.location.href='admin-department-card.php?id=1'"
+                                            title="View Department"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="auto">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
+                                            onclick="window.location.href='admin-department-card.php?id=1'"
+                                            title="Edit Department"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="auto">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <span class="department-badge department-badge-active bold">Active</span>
+                                <span class="department-badge department-badge-pending bold">Pending</span>
+                                <span class="department-badge department-badge-inactive bold">Inactive</span>
+                                <!--Note: Status pills for when admin wants to disable/enable departments-->
+
+                                <div class="department-info mt-2">
+                                    <div class="info-row">
+                                        <i class="bi bi-person-badge me-2"></i>
+                                        <span class="label">Head:</span>
+                                        <span class="value bold">Minerva McGonagall</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <i class="bi bi-people me-2"></i>
+                                        <span class="label">Number of faculty:</span>
+                                        <span class="value bold">5</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="department-card">
+                                <div class="department-header d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-start">
+                                        <h3 class="bold">example if newly created</h3>
+                                    </div>
+                                    <div class="d-flex align-items-end">
+                                        <button class="btn-icon btn-icon-view d-inline-flex align-items-center justify-content-center"
+                                            onclick="window.location.href='admin-department-card.php?id=1'"
+                                            title="View Department"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="auto">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
+                                            onclick="window.location.href='admin-department-card.php?id=1'"
+                                            title="Edit Department"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="auto">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <span class="department-badge department-badge-pending bold">Pending</span>
+
+                                <div class="department-info mt-2">
+                                    <div class="info-row">
+                                        <i class="bi bi-person-badge me-2"></i>
+                                        <span class="label">Head:</span>
+                                        <span class="value bold">None assigned</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <i class="bi bi-people me-2"></i>
+                                        <span class="label">Number of faculty:</span>
+                                        <span class="value bold">None assigned</span>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
+
+
                     </div>
                 </div>
+
 
                 <div class="group-container gap-3">
                     <!-- Faculty Directory -->
@@ -273,9 +358,11 @@ $conn->close();
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
+
+    </div>
+    </div>
     </div>
 
     <?php include '../../php/includes/profile-offcanvas.php'; ?>

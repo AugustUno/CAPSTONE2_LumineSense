@@ -97,6 +97,7 @@ $conn->close();
 
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="../../css/containers.css">
+    <link rel="stylesheet" href="../../css/admin-common.css">
 
     <style>
         .review-card {

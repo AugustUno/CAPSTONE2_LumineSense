@@ -126,3 +126,73 @@
     color: #ffb52c;
     transform: scale(1.08);
 }
+
+.departments-scroll-container {
+    padding-right: 0.5rem !important;
+}
+
+.department-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid var(--secondary-color-2);
+    margin-bottom: 0.75rem;
+}
+
+.department-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.department-name {
+    font-size: 22px;
+    color: var(--secondary-color-1);
+    margin: 0;
+}
+
+.department-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.info-row .label {
+    font-weight: 500;
+    margin-right: 0.25rem;
+}
+
+.info-row .value {
+    color: var(--secondary-color-1);
+}
+
+.department-badge {
+    font-size: 11px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.department-badge-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.department-badge-pending {
+    background: #fef3c7;
+    color: #78350f;
+}
+
+.department-badge-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}

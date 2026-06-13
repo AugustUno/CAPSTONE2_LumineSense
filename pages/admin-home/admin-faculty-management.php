@@ -43,6 +43,7 @@ $conn->close();
     <link rel="stylesheet" href="../../css/modals.css">
     <link rel="stylesheet" href="../../css/admin-common.css">
     <link rel="stylesheet" href="../../css/admin-faculty-management.css">
+    <link rel="stylesheet" href="../../css/tooltip.css">
 </head>
 
 <body class="contrast-bg">
@@ -62,7 +63,7 @@ $conn->close();
     <div class="parent-container">
 
         <div class="child-container">
-            <div class="main-container faculty-management">
+            <div class="main-container faculty-management gap-5">
 
                 <div class="group-container">
                     <!-- Stats cards -->
@@ -102,7 +103,7 @@ $conn->close();
                             </div>
                         </div>
                         <div>
-                            <!--Department see figma for styling-->
+                            <!--Department see figma for full styling-->
                         </div>
                     </div>
                 </div>
@@ -113,46 +114,65 @@ $conn->close();
                         <div class="faculty-directory-container d-flex flex-column justify-content-center align-items-center p-3 mb-3">
                             <h2 class="bold mb-0"><i class="bi bi-people mb-3"></i> Faculty Directory</h2>
                             <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-outline-secondary active" onclick="filterList('all')">All Records</button>
-                                <button type="button" class="btn btn-outline-success" onclick="filterList('approved')">Approved</button>
-                                <button type="button" class="btn btn-outline-secondary" onclick="filterList('unverified')">Unverified</button>
+                                <button type="button" class="light medium gap-2" style="font-size: 12px;" onclick="filterList('all')"><i class="bi bi-border-all"></i> All Records</button>
+                                <button type="button" class="light gap-2" style="font-size: 12px;" onclick="filterList('approved')"><i class="bi bi-check-circle"></i> Approved</button>
+                                <button type="button" class="light gap-2" style="font-size: 12px;" onclick="filterList('unverified')"><i class="bi bi-x-circle"></i> Unverified</button>
                             </div>
                         </div>
                         <div class="style-scrollbar" style="max-height: 400px; overflow-y: auto;">
                             <?php if (empty($faculty_list)): ?>
                                 <p class="text-muted text-center py-4">No records found inside the active index.</p>
                                 <?php else: foreach ($faculty_list as $faculty): ?>
-                                    <div class="faculty-list-item d-flex align-items-center justify-content-between p-3 mb-2 border rounded" data-status="<?= $faculty['status_label'] ?>">
+                                    <div class="faculty-list-item d-flex align-items-start justify-content-between p-3 mb-2 border rounded" data-status="<?= $faculty['status_label'] ?>">
                                         <div class="d-flex align-items-center gap-3">
-                                            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary bold" style="width: 40px; height: 40px;">
+                                            <div class="avatar bg-light rounded-circle d-flex align-items-center justify-content-center text-secondary bold">
                                                 <?= strtoupper(substr($faculty['first_name'], 0, 1) . substr($faculty['last_name'], 0, 1)) ?>
                                             </div>
                                             <div>
-                                                <h6 class="bold mb-0"><?= htmlspecialchars($faculty['first_name'] . ' ' . $faculty['last_name']) ?></h6>
-                                                <span class="text-muted small"><?= htmlspecialchars($faculty['email']) ?></span>
+                                                <h5 class="bold mb-0"><?= htmlspecialchars($faculty['first_name'] . ' ' . $faculty['last_name']) ?></h5>
+                                                <span class="text-muted small" style="font-size: 11px;"><?= htmlspecialchars($faculty['email']) ?></span>
                                             </div>
-                                            <div>
-                                                <a href="admin-faculty-card.php?id=<?= $faculty['id'] ?>"
-                                                    class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-eye me-1"></i>
-                                                </a>
-                                            </div>
+                                            <?php if ($faculty['status_label'] === 'approved'): ?>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-circle-check"></i><!--  Approved Account --></span>
+                                            <?php elseif ($faculty['status_label'] === 'pending'): ?>
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"><i class="fa-solid fa-clock"></i><!--  Awaiting Approval --></span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary-subtle text-secondary px-2 py-1"><i class="fa-solid fa-envelope"></i><!-- Email Pending Verification --></span>
+                                            <?php endif; ?>
                                         </div>
                                         <div class="d-flex align-items-center gap-3">
+                                            <div>
+                                                <button type="button"
+                                                    class="btn-icon btn-icon-view d-inline-flex align-items-center" 
+                                                    onclick="window.location.href='admin-faculty-card.php?id=<?= $faculty['id'] ?>'" 
+                                                    title="View Profile" 
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="auto">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </div>
                                             <?php if ($faculty['status_label'] === 'approved'): ?>
-                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Approved Account</span>
-                                                <form method="POST" class="mb-0">
-                                                    <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>"><input type="hidden" name="action" value="revoke">
-                                                    <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none small p-0">Revoke Access</button>
-                                                </form>
-                                            <?php elseif ($faculty['status_label'] === 'pending'): ?>
-                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">Awaiting Approval</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-secondary-subtle text-secondary px-2 py-1">Email Pending Verification</span>
+                                            <form method="POST" class="mb-0">
+                                                <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>"><input type="hidden" name="action" value="revoke">
+                                                <button type="submit" 
+                                                    class="btn-icon btn-icon-revoke"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="auto"
+                                                    title="Revoke Access">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </button>
+                                            </form>
                                             <?php endif; ?>
                                             <form method="POST" class="mb-0" onsubmit="return confirm('Permanently wipe this record?');">
-                                                <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>"><input type="hidden" name="action" value="delete">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0"><i class="fa-regular fa-trash-can"></i></button>
+                                                <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>">
+                                                <input type="hidden" name="action" value="delete">
+                                                <button type="submit" 
+                                                    class="btn-icon btn-icon-del"
+                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-placement="auto"
+                                                    title="Delete Faculty">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
                                             </form>
                                         </div>
                                     </div>
@@ -246,8 +266,11 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../script/animations.js"></script>
     <script src="../../script/toggles.js"></script>
+    <script src="../../script/tooltip.js"></script>
 
     <script>
+        
+
         document.addEventListener("DOMContentLoaded", function() {
             const toast = document.getElementById('toastMsg');
             if (toast && toast.classList.contains('show')) {
@@ -257,8 +280,8 @@ $conn->close();
 
         function filterList(status) {
             const buttons = document.querySelectorAll('.btn-group button');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            buttons.forEach(btn => btn.classList.remove('medium'));
+            event.currentTarget.classList.add('medium');
 
             document.querySelectorAll('.faculty-list-item').forEach(item => {
                 if (status === 'all' || item.dataset.status === status) {

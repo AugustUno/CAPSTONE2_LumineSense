@@ -46,8 +46,6 @@
     .faculty-directory-container {
         background: var(--primary-color) !important;
         border-radius: 8px !important;
-
-        
     }
 
     .faculty-list-item {
@@ -57,9 +55,74 @@
         display: flex !important;
         flex-direction: column !important;
         gap: 0.5rem !important;
+
+        .avatar {
+            min-width: 4rem !important;
+            min-height: 4rem !important;
+            max-width: 4rem !important;
+            max-height: 4rem !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+        }
     }
 
     .btn-group button {
-            width: 100% !important;
-        }
+        width: 100% !important;
+    }
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color .2s, transform .15s;
+}
+
+.btn-icon-edit {
+    background: #e9d5ff;
+    color: var(--secondary-color-1);
+}
+
+.btn-icon-edit:hover {
+    background: var(--secondary-color-1);
+    color: #fff;
+    transform: scale(1.08);
+}
+
+.btn-icon-del {
+    background: #ffe4ec;
+    color: #c0004e;
+}
+
+.btn-icon-del:hover {
+    background: #c0004e;
+    color: #fff;
+    transform: scale(1.08);
+}
+
+.btn-icon-view {
+    background: #599bf1;
+    color: var(--primary-color);
+}
+
+.btn-icon-view:hover {
+    background: #b0d2ff;
+    color: #599bf1;
+    transform: scale(1.08);
+}
+
+.btn-icon-revoke {
+    background: #ffb52c;
+    color: var(--black);
+}
+
+.btn-icon-revoke:hover {
+    background: #fbff00;
+    color: #ffb52c;
+    transform: scale(1.08);
 }

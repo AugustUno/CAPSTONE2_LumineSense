@@ -108,7 +108,7 @@ $conn->close();
                     </div>
                 </div>
 
-                <div class="group-container">
+                <div class="group-container gap-3">
                     <!-- Faculty Directory -->
                     <div class="faculty-directory card border-0 shadow-sm p-4 bg-white w-100">
                         <div class="faculty-directory-container d-flex flex-column justify-content-center align-items-center p-3 mb-3">
@@ -143,32 +143,32 @@ $conn->close();
                                         <div class="d-flex align-items-center gap-3">
                                             <div>
                                                 <button type="button"
-                                                    class="btn-icon btn-icon-view d-inline-flex align-items-center" 
-                                                    onclick="window.location.href='admin-faculty-card.php?id=<?= $faculty['id'] ?>'" 
-                                                    title="View Profile" 
-                                                    data-bs-toggle="tooltip" 
+                                                    class="btn-icon btn-icon-view d-inline-flex align-items-center"
+                                                    onclick="window.location.href='admin-faculty-card.php?id=<?= $faculty['id'] ?>'"
+                                                    title="View Profile"
+                                                    data-bs-toggle="tooltip"
                                                     data-bs-placement="auto">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                             </div>
                                             <?php if ($faculty['status_label'] === 'approved'): ?>
-                                            <form method="POST" class="mb-0">
-                                                <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>"><input type="hidden" name="action" value="revoke">
-                                                <button type="submit" 
-                                                    class="btn-icon btn-icon-revoke"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="auto"
-                                                    title="Revoke Access">
-                                                    <i class="bi bi-x-circle"></i>
-                                                </button>
-                                            </form>
+                                                <form method="POST" class="mb-0">
+                                                    <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>"><input type="hidden" name="action" value="revoke">
+                                                    <button type="submit"
+                                                        class="btn-icon btn-icon-revoke"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="auto"
+                                                        title="Revoke Access">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </button>
+                                                </form>
                                             <?php endif; ?>
                                             <form method="POST" class="mb-0" onsubmit="return confirm('Permanently wipe this record?');">
                                                 <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>">
                                                 <input type="hidden" name="action" value="delete">
-                                                <button type="submit" 
+                                                <button type="submit"
                                                     class="btn-icon btn-icon-del"
-                                                    data-bs-toggle="tooltip" 
+                                                    data-bs-toggle="tooltip"
                                                     data-bs-placement="auto"
                                                     title="Delete Faculty">
                                                     <i class="bi bi-trash"></i>
@@ -184,8 +184,14 @@ $conn->close();
                     <!--Registration Approvals Pending-->
                     <div class="row g-4 mb-4">
                         <div class="col-12">
-                            <div class="card border-0 shadow-sm p-4 bg-white h-100">
-                                <h5 class="bold mb-3 text-warning"><i class="fa-solid fa-user-clock me-2"></i> Registration Approvals Pending</h5>
+                            <div class="card border-0 shadow-sm p-4 h-100" style="background-color: var(--secondary-color-1);">
+                                <div class="section-topbar d-flex my-auto gap-1 align-items-center justify-content-between p-3 mb-3" style="background: var(--primary-color) !important;
+                                border-radius: 8px !important;">
+                                    <div class="d-flex flex-column mx-2 align-items-start">
+                                        <h2 class="bold" style="font-size:24.5px;"><i class="fa-solid fa-user-clock me-2"></i>Pending Approvals</h2>
+                                        <p class="subtitle">Pending registration approvals are displayed here.</p>
+                                    </div>
+                                </div>
                                 <div class="style-scrollbar" style="max-height: 300px; overflow-y: auto;">
                                     <?php
                                     $has_pending = false;
@@ -195,27 +201,38 @@ $conn->close();
                                     ?>
                                             <div class="d-flex align-items-center justify-content-between p-3 mb-2 border border-warning-subtle rounded bg-warning-subtle bg-opacity-10">
                                                 <div>
-                                                    <h6 class="bold mb-0"><?= htmlspecialchars($faculty['first_name'] . ' ' . $faculty['last_name']) ?></h6>
-                                                    <span class="text-muted small"><?= htmlspecialchars($faculty['email']) ?></span>
+                                                    <h5 class="bold mb-0"><?= htmlspecialchars($faculty['first_name'] . ' ' . $faculty['last_name']) ?></h5>
+                                                    <span class="text-muted small" style="font-size: 11px;"><?= htmlspecialchars($faculty['email']) ?></span>
                                                 </div>
-                                                <a href="admin-faculty-review.php?id=<?= $faculty['id'] ?>"
-                                                    class="btn btn-sm btn-primary px-3">
-                                                    <i class="fa-solid fa-eye me-1"></i> Review
-                                                </a>
+
+                                                <button type="button"
+                                                    class="btn-icon btn-icon-view d-inline-flex align-items-center"
+                                                    onclick="window.location.href='admin-faculty-review.php?id=<?= $faculty['id'] ?>'"
+                                                    title="Review Access Request"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="auto">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
                                             </div>
                                         <?php endif;
-                                        endforeach;
-                                        if (!$has_pending):
+                                    endforeach;
+                                    if (!$has_pending):
                                         ?>
-                                        <p class="text-muted text-center py-4 small">No pending registrations require attention right now.</p>
+                                        <p class="text-center py-4 small" style="color: #fff;">No pending registrations require attention right now.</p>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                         <!-- Schedule Extension Requests -->
                         <div class="col-12">
-                            <div class="card border-0 shadow-sm p-4 bg-white h-100">
-                                <h5 class="bold mb-3 text-info"><i class="bi bi-clock-history me-2"></i> Schedule Extensions Pending</h5>
+                            <div class="card border-0 shadow-sm p-4 h-100" style="background-color: var(--secondary-color-1);">
+                                <div class="section-topbar d-flex my-auto gap-1 align-items-center justify-content-between p-3 mb-3" style="background: var(--primary-color) !important;
+                                border-radius: 8px !important;">
+                                    <div class="d-flex flex-column mx-2 align-items-start">
+                                        <h5 class="bold" style="font-size:24.5px;"><i class="bi bi-clock-history me-2"></i>Pending Extensions</h5>
+                                        <p class="subtitle">Pending schedule extensions are displayed here.</p>
+                                    </div>
+                                </div>
                                 <div class="style-scrollbar" style="max-height: 300px; overflow-y: auto;">
                                     <?php
                                     $has_ext = false;
@@ -249,7 +266,7 @@ $conn->close();
                                     endforeach;
                                     if (!$has_ext):
                                         ?>
-                                        <p class="text-muted text-center py-4 small">No allocation adjustments are currently requested.</p>
+                                        <p class=" text-center py-4 small" style="color: #fff;">No schedule extensions are currently requested.</p>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -269,8 +286,6 @@ $conn->close();
     <script src="../../script/tooltip.js"></script>
 
     <script>
-        
-
         document.addEventListener("DOMContentLoaded", function() {
             const toast = document.getElementById('toastMsg');
             if (toast && toast.classList.contains('show')) {

@@ -99,8 +99,7 @@ $conn->close();
                                 <h2 class="bold"><i class="bi bi-diagram-3 me-2"></i>Departments</h2>
                             </div>
                             <div class="d-flex mx-2 align-items-end">
-                                <button class="medium mx-2 w-100">Add Department</button>
-                                <button class="light mx-2" onclick="dissolve('admin-reports.php?tab=activity')">View All</button>
+                                <button class="medium px-2 flex-grow-1"><i class="bi bi-plus-lg"></i>Add Department</button>
                             </div>
                         </div>
                         <div class="departments-scroll-container gap-2" style="max-height: 100vh; overflow-y: auto;">
@@ -118,13 +117,13 @@ $conn->close();
                                             data-bs-placement="auto">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
+                                        <!-- <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
                                             onclick="window.location.href='admin-department-card.php?id=1'"
                                             title="Edit Department"
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="auto">
                                             <i class="bi bi-pencil"></i>
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </div>
 
@@ -159,13 +158,6 @@ $conn->close();
                                             data-bs-toggle="tooltip"
                                             data-bs-placement="auto">
                                             <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
-                                            onclick="window.location.href='admin-department-card.php?id=1'"
-                                            title="Edit Department"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="auto">
-                                            <i class="bi bi-pencil"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -248,14 +240,16 @@ $conn->close();
                                                     </button>
                                                 </form>
                                             <?php endif; ?>
-                                            <form method="POST" class="mb-0" onsubmit="return confirm('Permanently wipe this record?');">
+                                            <form method="POST" class="mb-0">
                                                 <input type="hidden" name="faculty_id" value="<?= $faculty['id'] ?>">
                                                 <input type="hidden" name="action" value="delete">
                                                 <button type="submit"
                                                     class="btn-icon btn-icon-del"
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="auto"
-                                                    title="Delete Faculty">
+                                                    title="Delete Faculty"
+                                                    onclick="openDeleteFacultyModal(<?= $faculty['id'] ?>, '<?= addslashes($faculty['first_name'] . ' ' . $faculty['last_name']) ?>')">
+                                                    <!--Dummy onclick function for backend implementation later on-->
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -366,6 +360,33 @@ $conn->close();
     </div>
 
     <?php include '../../php/includes/profile-offcanvas.php'; ?>
+
+    <!-- ═══ DELETE FACULTY MODAL ═══ Fix as intended-->
+    <div class="modal fade" id="deleteFacultyModal" tabindex="-1" aria-hidden="true">
+        <div class="room-details-modal modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header modal-header-warning">
+                    <h5 class="modal-title">Delete Faculty</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-trash" style="font-size:2.5rem;color:#c0392b;"></i>
+                    <p class="mt-3 mb-0" style="font-size:15px;">
+                        Are you sure you want to delete <strong id="deleteFacultyName"></strong>?
+                        This will also remove all schedules and logs for this faculty.
+                    </p>
+                </div>
+                <form method="POST" action="../../php/handlers/faculty-approvals-handler.php">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="faculty_id" id="deleteFacultyId">
+                    <div class="modal-footer d-flex flex-nowrap flex-row justify-content-between gap-2">
+                        <button type="button" class="light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="medium" style="background:#c0392b;">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../script/animations.js"></script>

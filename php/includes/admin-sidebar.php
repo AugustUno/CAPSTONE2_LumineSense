@@ -58,9 +58,7 @@
             'admin-room-manage.php': 1,
             'admin-analytics.php': 2,
             'admin-faculty-management.php': 3,
-            'admin-faculty-card.php': 3,
-            'admin-profile-settings.php': 4,
-            'admin-reports.php': null,
+            'admin-reports.php': 4,
         };
         const index = map[page];
         if (index !== null && index !== undefined) {

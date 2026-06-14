@@ -361,7 +361,7 @@ $conn->close();
 
     <?php include '../../php/includes/profile-offcanvas.php'; ?>
 
-    <!-- ═══ DELETE FACULTY MODAL ═══ Fix as intended-->
+    <!-- ═══ DELETE FACULTY MODAL ═══ Preempt the delete functionality before deleting-->
     <div class="modal fade" id="deleteFacultyModal" tabindex="-1" aria-hidden="true">
         <div class="room-details-modal modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
@@ -413,6 +413,12 @@ $conn->close();
                     item.style.setProperty('display', 'none', 'important');
                 }
             });
+        }
+
+        function openDeleteFacultyModal(id, name) {
+            document.getElementById('deleteFacultyId').value = id;
+            document.getElementById('deleteFacultyName').textContent = name;
+            new bootstrap.Modal(document.getElementById('deleteFacultyModal')).show();
         }
     </script>
 </body>

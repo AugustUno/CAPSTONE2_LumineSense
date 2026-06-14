@@ -99,7 +99,8 @@ $conn->close();
                                 <h2 class="bold"><i class="bi bi-diagram-3 me-2"></i>Departments</h2>
                             </div>
                             <div class="d-flex mx-2 align-items-end">
-                                <button class="medium px-2 flex-grow-1"><i class="bi bi-plus-lg"></i>Add Department</button>
+                                <button class="medium px-2 flex-grow-1"
+                                    onclick="openAddDepartmentModal()"><i class="bi bi-plus-lg"></i>Add Department</button>
                             </div>
                         </div>
                         <div class="departments-scroll-container gap-2" style="max-height: 100vh; overflow-y: auto;">
@@ -388,6 +389,84 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Add Department Modal -->
+    <div class="modal fade" id="addDepartmentModal" tabindex="-1" aria-hidden="true">
+        <div class="room-details-modal modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-primary">
+                    <h5 class="modal-title">Add Department</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="addDepartmentForm">
+                        <!-- Name Field -->
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" placeholder="Enter department name">
+                        </div>
+
+                        <!-- Head of Department Dropdown -->
+                        <div class="mb-3">
+                            <label class="form-label">Head of Department</label>
+                            <select class="form-select">
+                                <option value="" selected disabled>Select Head of Department</option>
+                                <option value="1">Minerva McGonagall</option>
+                                <option value="2">Severus Snape</option>
+                                <option value="3">Albus Dumbledore</option>
+                                <option value="4">Filius Flitwick</option>
+                                <option value="5">Pomona Sprout</option>
+                            </select>
+                        </div>
+
+                        <!-- Faculty Members Section -->
+                        <div class="mb-3">
+                            <label class="form-label">Faculty Members</label>
+                            <!-- Search Bar -->
+                            <input type="text" class="form-control mb-2" placeholder="Search faculty members...">
+                            <!-- Radio Buttons for Faculty Members -->
+                            <div class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="facultyMember" id="faculty1" value="1">
+                                    <label class="form-check-label" for="faculty1">
+                                        Minerva McGonagall
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="facultyMember" id="faculty2" value="2">
+                                    <label class="form-check-label" for="faculty2">
+                                        Severus Snape
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="facultyMember" id="faculty3" value="3">
+                                    <label class="form-check-label" for="faculty3">
+                                        Albus Dumbledore
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="facultyMember" id="faculty4" value="4">
+                                    <label class="form-check-label" for="faculty4">
+                                        Filius Flitwick
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="facultyMember" id="faculty5" value="5">
+                                    <label class="form-check-label" for="faculty5">
+                                        Pomona Sprout
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer d-flex flex-nowrap flex-row justify-content-between gap-2">
+                    <button type="button" class="light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="medium">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../script/animations.js"></script>
     <script src="../../script/toggles.js"></script>
@@ -419,6 +498,10 @@ $conn->close();
             document.getElementById('deleteFacultyId').value = id;
             document.getElementById('deleteFacultyName').textContent = name;
             new bootstrap.Modal(document.getElementById('deleteFacultyModal')).show();
+        }
+
+        function openAddDepartmentModal() {
+            new bootstrap.Modal(document.getElementById('addDepartmentModal')).show();
         }
     </script>
 </body>

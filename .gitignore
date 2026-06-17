@@ -1,1 +1,80 @@
-node_modules/
+```php
+<?php
+// Database connection parameters
+$servername = "localhost";
+$username = "your_username";
+$password = "your_password";
+$dbname = "your_database";
+
+try {
+    $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Get faculty ID from session or URL parameter
+    $faculty_id = $_SESSION['faculty_id'] ?? $_GET['id'] ?? null;
+
+    if (!$faculty_id) {
+        throw new Exception("Faculty ID not provided");
+    }
+
+    // Fetch faculty timetable data
+    $stmt = $pdo->prepare("
+        SELECT s.subject_name, t.start_time, t.end_time, t.day_of_week, t.room_number
+        FROM timetables t
+        JOIN subjects s ON t.subject_id = s.id
+        WHERE t.faculty_id = :faculty_id
+        ORDER BY t.day_of_week, t.start_time
+    ");
+    $stmt->bindParam(':faculty_id', $faculty_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $timetable_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (Exception $e) {
+    error_log("Database error in faculty-timetable.php: " . $e->getMessage());
+    die("An error occurred while fetching timetable data.");
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Faculty Timetable</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Timetable for Faculty ID: <?php echo htmlspecialchars($faculty_id); ?></h1>
+    
+    <?php if (!empty($timetable_data)): ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Day</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Room</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($timetable_data as $row): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['day_of_week']); ?></td>
+                        <td><?php echo htmlspecialchars($row['start_time']); ?></td>
+                        <td><?php echo htmlspecialchars($row['end_time']); ?></td>
+                        <td><?php echo htmlspecialchars($row['room_number']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p>No timetable data available.</p>
+    <?php endif; ?>
+</body>
+</html>
+```

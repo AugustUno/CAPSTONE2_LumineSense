@@ -101,6 +101,8 @@ $conn->close();
     <link type="icon" href="../../logo.png">
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="../../css/containers.css">
+    <link rel="stylesheet" href="../../css/tooltip.css">
+
 
     <title>Class Schedule – LumineSense</title>
 
@@ -192,18 +194,46 @@ $conn->close();
 
         .slot-room {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 18px;
         }
 
         .slot-subject {
             font-size: 13px;
-            color: #666;
+            color: var(--muted-dark);
+        
+            span {
+                text-transform: uppercase;
+                font-size: 10px;
+            }
         }
 
         .slot-actions {
             display: flex;
             gap: 0.25rem;
             align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .extend-icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            background: #e9d5ff;
+            color: var(--secondary-color-1);
+            transition: background 0.5s, color 0.2s;
+        }
+
+        .extend-icon-btn:hover {
+            background: var(--secondary-color-1);
+            color: white;
+            transform: scale(1.08);
         }
 
         .badge-ext-pending {
@@ -211,7 +241,12 @@ $conn->close();
             color: #856404;
             padding: 3px 10px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 14px;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .badge-ext-approved {
@@ -219,7 +254,12 @@ $conn->close();
             color: #0f5132;
             padding: 3px 10px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 14px;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .badge-ext-rejected {
@@ -227,7 +267,12 @@ $conn->close();
             color: #842029;
             padding: 3px 10px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 14px;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .no-sched {
@@ -304,13 +349,56 @@ $conn->close();
                                         <div class="slot-left">
                                             <div class="slot-time">
                                                 <?php
+                                                // Start time
                                                 $start_parts = explode(' ', $start);
-                                                $time_part = $start_parts[0];
-                                                $ampm = isset($start_parts[1]) ? $start_parts[1] : 'AM';
+                                                $start_time_part = $start_parts[0];
+                                                $start_ampm = isset($start_parts[1]) ? $start_parts[1] : 'AM';
+
+                                                // End time
+                                                $end_parts = explode(' ', $end);
+                                                $end_time_part = $end_parts[0];
+                                                $end_ampm = isset($end_parts[1]) ? $end_parts[1] : 'AM';
                                                 ?>
-                                                <?= $time_part ?>
+                                                <?= $start_time_part ?>
                                                 <hr>
-                                                <h4><?= $ampm ?></h4>
+                                                <?= $end_time_part ?>
+                                                <h4><?= $start_ampm ?></h4>
+                                            </div>
+                                            <div class="slot-actions">
+                                                <?php if ($ext_status === 'pending'): ?>
+                                                    <span class="badge-ext-pending"
+                                                        title="Extension request pending"
+                                                        data-bs-toggle="tooltip">
+                                                        <i class="bi bi-hourglass-bottom"></i>
+                                                    </span>
+                                                <?php elseif ($ext_status === 'approved'): ?>
+                                                    <span class="badge-ext-approved" 
+                                                    title="Extension approved" 
+                                                    data-bs-toggle="tooltip">
+                                                    <i class="bi bi-check-circle"></i>
+                                                </span>
+                                                <?php elseif ($ext_status === 'rejected'): ?>
+                                                    <span class="badge-ext-rejected" 
+                                                    title="Extension rejected" 
+                                                    data-bs-toggle="tooltip">
+                                                    <i class="bi bi-x-circle"></i>
+                                                </span>
+                                                <button class="extend-icon-btn"
+                                                    onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')"
+                                                    title="Re-request Extension"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="auto">
+                                                        <i class="bi bi-clock-history"></i>
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="extend-icon-btn"
+                                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')"
+                                                        title="Request Extension"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="auto">
+                                                        <i class="bi bi-clock-history"></i>
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                         <div class="slot-right">
@@ -318,26 +406,7 @@ $conn->close();
                                                 <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($slot['room_name']) ?>
                                             </div>
                                             <div class="slot-subject">
-                                                Subject: Math
-                                            </div>
-                                            <div class="slot-actions">
-                                                <?php if ($ext_status === 'pending'): ?>
-                                                    <span class="badge-ext-pending">⏳ Pending</span>
-                                                <?php elseif ($ext_status === 'approved'): ?>
-                                                    <span class="badge-ext-approved">✔ Approved</span>
-                                                <?php elseif ($ext_status === 'rejected'): ?>
-                                                    <span class="badge-ext-rejected">✖ Rejected</span>
-                                                    <!-- Allow re-request if rejected -->
-                                                    <button class="light ms-1"
-                                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
-                                                        Re-request
-                                                    </button>
-                                                <?php else: ?>
-                                                    <button class="light"
-                                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
-                                                        Extend
-                                                    </button>
-                                                <?php endif; ?>
+                                               <span>subject</span><h5>Math</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -384,6 +453,7 @@ $conn->close();
 
         <script src="../../script/animations.js"></script>
         <script src="../../script/toggles.js"></script>
+        <script src="../../script/tooltip.js"></script>
     </div>
 
     <script>

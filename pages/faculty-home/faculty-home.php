@@ -89,6 +89,7 @@ $conn->close();
     <link rel="stylesheet" href="../../css/containers.css">
     <link rel="stylesheet" href="../../css/modals.css">
     <link rel="stylesheet" href="../../css/faculty-home.css">
+    <link rel="stylesheet" href="../../css/faculty-common.css">
 
     <title>Home – LumineSense</title>
 
@@ -98,6 +99,8 @@ $conn->close();
     <div class="parent-container">
 
         <?php include '../../php/includes/faculty-topbar.php'; ?>
+        <?php include '../../php/includes/faculty-sidebar.php'; ?>
+
 
         <div class="child-container">
             <div class="main-container homepage gap-3">
@@ -330,7 +333,7 @@ $conn->close();
                             <div class="activity-list px-2 gap-2 align-items-center max-width">
                                 <?php if (empty($logs)): ?>
                                     <p class="text-muted">No recent activity yet.</p>
-                                <?php else:
+                                    <?php else:
                                     foreach ($logs as $log): ?>
                                         <div class="d-flex align-items-start gap-2" style="font-size:0.78rem; padding: 6px 0;">
                                             <div class="flex-shrink-0">
@@ -376,7 +379,6 @@ $conn->close();
 
                 </div><!-- /col 3 -->
 
-                <?php include '../../php/includes/faculty-sidebar.php'; ?>
 
                 <!-- ══════════════════════════════
                      PROFILE MODAL
@@ -728,24 +730,27 @@ $conn->close();
             }
 
             // ── Update Recent Activities ──────────────────────────────
-if (data.logs && data.logs.length > 0) {
-    const activityList = document.querySelector('.activity-list.px-2');
-    if (activityList) {
-        activityList.innerHTML = data.logs.map(log => {
-            const type = log.event_type || '';
-            const badgeClass = type.includes('on') ? 'bg-success' :
-                               type.includes('off') ? 'bg-danger' :
-                               type.includes('gesture') ? 'bg-primary' : 'bg-secondary';
-            const by = (log.triggered_by || 'manual').toLowerCase().trim();
-            const byBadge = (by === 'gesture' || by === 'pir')
-                ? ['bg-primary', 'bi-hand-index-thumb', 'Gesture']
-                : ['bg-secondary', 'bi-toggle-on', by.charAt(0).toUpperCase() + by.slice(1)];
-            const time = new Date(log.event_time.replace(' ', 'T'));
-            const timeStr = time.toLocaleString('en-US', {
-                hour: 'numeric', minute: '2-digit', hour12: true,
-                month: 'short', day: 'numeric'
-            });
-            return `
+            if (data.logs && data.logs.length > 0) {
+                const activityList = document.querySelector('.activity-list.px-2');
+                if (activityList) {
+                    activityList.innerHTML = data.logs.map(log => {
+                        const type = log.event_type || '';
+                        const badgeClass = type.includes('on') ? 'bg-success' :
+                            type.includes('off') ? 'bg-danger' :
+                            type.includes('gesture') ? 'bg-primary' : 'bg-secondary';
+                        const by = (log.triggered_by || 'manual').toLowerCase().trim();
+                        const byBadge = (by === 'gesture' || by === 'pir') ?
+                            ['bg-primary', 'bi-hand-index-thumb', 'Gesture'] :
+                            ['bg-secondary', 'bi-toggle-on', by.charAt(0).toUpperCase() + by.slice(1)];
+                        const time = new Date(log.event_time.replace(' ', 'T'));
+                        const timeStr = time.toLocaleString('en-US', {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true,
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                        return `
                 <div class="d-flex align-items-start gap-2" style="font-size:0.78rem; padding: 6px 0;">
                     <div class="flex-shrink-0">
                         <span class="badge ${badgeClass} rounded-pill">
@@ -764,9 +769,9 @@ if (data.logs && data.logs.length > 0) {
                 </div>
                 <hr>
             `;
-        }).join('');
-    }
-}
+                    }).join('');
+                }
+            }
         }
 
         pollDashboard();

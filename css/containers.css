@@ -211,7 +211,6 @@
 .main-container.homepage {
     display: flex;
     flex-direction: row;
-    width: 100%;
     padding: 2rem;
     gap: 3rem;
 
@@ -509,7 +508,7 @@
     img {
         width: 8rem;
         height: 8rem;
-        object-fit: cover;
+        object-fit: fill;
     }
 }
 

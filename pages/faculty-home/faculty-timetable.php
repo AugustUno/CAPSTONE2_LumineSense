@@ -98,11 +98,17 @@ $conn->close();
     <title>Class Schedule – LumineSense</title>
 
     <style>
+        .weekly-schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1rem;
+            width: 100%;
+        }
         .day-card {
             background: #f8f9fa;
             border-radius: 10px;
             padding: 1rem;
-            margin-bottom: 0.8rem;
+            min-height: 200px;
         }
         .day-label {
             font-weight: 700;
@@ -111,24 +117,46 @@ $conn->close();
             letter-spacing: 1px;
             color: #9f9f9f;
             margin-bottom: 0.5rem;
+            text-align: center;
         }
         .day-label.today { color: var(--secondary-color-4, #9b00e9); }
         .slot-row {
             display: flex;
-            align-items: center;
-            gap: 0.8rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
             background: #fff;
             border-radius: 8px;
             padding: 0.7rem 1rem;
             margin-bottom: 0.4rem;
             box-shadow: 0 1px 3px rgba(0,0,0,.06);
+            width: 100%;
         }
-        .slot-time { font-size: 13px; color: #555; min-width: 130px; }
-        .slot-room { flex: 1; font-weight: 600; font-size: 14px; }
+        .slot-time { font-size: 13px; color: #555; width: 100%; }
+        .slot-room { font-weight: 600; font-size: 14px; width: 100%; }
+        .slot-actions { width: 100%; display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; }
         .badge-ext-pending  { background: #fff3cd; color: #856404; padding: 3px 10px; border-radius: 20px; font-size: 11px; }
         .badge-ext-approved { background: #d1e7dd; color: #0f5132; padding: 3px 10px; border-radius: 20px; font-size: 11px; }
         .badge-ext-rejected { background: #f8d7da; color: #842029; padding: 3px 10px; border-radius: 20px; font-size: 11px; }
-        .no-sched { color: #ccc; font-size: 13px; padding: 0.3rem 0; }
+        .no-sched { color: #ccc; font-size: 13px; padding: 0.3rem 0; text-align: center; }
+        
+        @media (max-width: 1200px) {
+            .weekly-schedule-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .weekly-schedule-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .weekly-schedule-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body class="contrast-bg">
@@ -154,58 +182,60 @@ $conn->close();
             <?php endif; ?>
 
             <!-- Weekly schedule -->
-            <?php foreach ($days as $day):
-                $is_today = ($day === $today);
-                $slots    = $schedule_by_day[$day];
-            ?>
-            <div class="day-card">
-                <div class="day-label <?= $is_today ? 'today' : '' ?>">
-                    <?= $day ?> <?= $is_today ? '· Today' : '' ?>
-                </div>
-
-                <?php if (empty($slots)): ?>
-                    <p class="no-sched">No classes scheduled.</p>
-                <?php else: foreach ($slots as $slot):
-                    $start    = date('g:i A', strtotime($slot['start_time']));
-                    $end      = date('g:i A', strtotime($slot['end_time']));
-                    $ext      = $slot['extended_until']
-                                ? date('g:i A', strtotime($slot['extended_until']))
-                                : null;
-                    $ext_status = $slot['ext_status'];
+            <div class="weekly-schedule-grid">
+                <?php foreach ($days as $day):
+                    $is_today = ($day === $today);
+                    $slots    = $schedule_by_day[$day];
                 ?>
-                    <div class="slot-row">
-                        <div class="slot-time">
-                            <?= $start ?> – <?= $end ?>
-                            <?php if ($ext): ?>
-                                <br><small class="text-success">Extended to <?= $ext ?></small>
-                            <?php endif; ?>
-                        </div>
-                        <div class="slot-room">
-                            <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($slot['room_name']) ?>
-                        </div>
-                        <div>
-                            <?php if ($ext_status === 'pending'): ?>
-                                <span class="badge-ext-pending">⏳ Pending</span>
-                            <?php elseif ($ext_status === 'approved'): ?>
-                                <span class="badge-ext-approved">✔ Approved</span>
-                            <?php elseif ($ext_status === 'rejected'): ?>
-                                <span class="badge-ext-rejected">✖ Rejected</span>
-                                <!-- Allow re-request if rejected -->
-                                <button class="light ms-1"
-                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
-                                    Re-request
-                                </button>
-                            <?php else: ?>
-                                <button class="light"
-                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
-                                    Extend
-                                </button>
-                            <?php endif; ?>
-                        </div>
+                <div class="day-card">
+                    <div class="day-label <?= $is_today ? 'today' : '' ?>">
+                        <?= $day ?> <?= $is_today ? '· Today' : '' ?>
                     </div>
-                <?php endforeach; endif; ?>
+
+                    <?php if (empty($slots)): ?>
+                        <p class="no-sched">No classes scheduled.</p>
+                    <?php else: foreach ($slots as $slot):
+                        $start    = date('g:i A', strtotime($slot['start_time']));
+                        $end      = date('g:i A', strtotime($slot['end_time']));
+                        $ext      = $slot['extended_until']
+                                    ? date('g:i A', strtotime($slot['extended_until']))
+                                    : null;
+                        $ext_status = $slot['ext_status'];
+                    ?>
+                        <div class="slot-row">
+                            <div class="slot-time">
+                                <?= $start ?> – <?= $end ?>
+                                <?php if ($ext): ?>
+                                    <br><small class="text-success">Extended to <?= $ext ?></small>
+                                <?php endif; ?>
+                            </div>
+                            <div class="slot-room">
+                                <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($slot['room_name']) ?>
+                            </div>
+                            <div class="slot-actions">
+                                <?php if ($ext_status === 'pending'): ?>
+                                    <span class="badge-ext-pending">⏳ Pending</span>
+                                <?php elseif ($ext_status === 'approved'): ?>
+                                    <span class="badge-ext-approved">✔ Approved</span>
+                                <?php elseif ($ext_status === 'rejected'): ?>
+                                    <span class="badge-ext-rejected">✖ Rejected</span>
+                                    <!-- Allow re-request if rejected -->
+                                    <button class="light ms-1"
+                                            onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
+                                        Re-request
+                                    </button>
+                                <?php else: ?>
+                                    <button class="light"
+                                            onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
+                                        Extend
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; endif; ?>
+                </div>
+                <?php endforeach; ?>
             </div>
-            <?php endforeach; ?>
 
         </div>
     </div>

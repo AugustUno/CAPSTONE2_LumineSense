@@ -101,4 +101,64 @@ $stmt->execute();
 $r = $stmt->get_result();
 while ($row = $r->fetch_assoc()) $gesture_logs[] = $row;
 $stmt->close();
-?>
+
+
+/**
+ * Returns icon/color data for a faculty activity log entry.
+ * Mirrors the admin activity_icon() function for consistent styling.
+ *
+ * Keys: icon, color, bg, label, typeBg, typeClr, typeLabel, notes
+ */
+function faculty_activity_icon(array $log): array
+{
+    // Determine the "event type" key
+    $evt = $log['event_type'] ?? '';
+
+    // ── Icon / colour maps ────────────────────────────────────────
+    $iconMap = [
+        // Room / lighting events
+        'on'             => ['bi-lightbulb-fill',     '#198754', '#d1e7dd'],
+        'off'            => ['bi-lightbulb',           '#842029', '#f8d7da'],
+        'light_on'       => ['bi-lightbulb-fill',     '#198754', '#d1e7dd'],
+        'light_off'      => ['bi-lightbulb',           '#842029', '#f8d7da'],
+        'motion_detect'  => ['bi-person-bounding-box', '#084298', '#cfe2ff'],
+        'gesture'        => ['bi-hand-index',          '#084298', '#cfe2ff'],
+        'schedule'       => ['bi-calendar-check',     '#198754', '#d1e7dd'],
+        'security_alert' => ['bi-exclamation-triangle-fill', '#842029', '#f8d7da'],
+        'class_start'    => ['bi-play-circle-fill',   '#198754', '#d1e7dd'],
+        'class_end'      => ['bi-stop-circle',        '#664d03', '#fff3cd'],
+        'door_open'      => ['bi-door-open-fill',     '#664d03', '#fff3cd'],
+        'door_close'     => ['bi-door-closed-fill',   '#5a3a00', '#ffe5b4'],
+
+        // Misc
+        'issue_raised'   => ['bi-exclamation-triangle-fill', '#842029', '#f8d7da'],
+        'issue_resolved' => ['bi-check-circle-fill',   '#198754', '#d1e7dd'],
+    ];
+
+    $default = ['bi-clock-history', '#5a5a5a', '#e9ecef'];
+
+    [$icon, $iconColor, $iconBg] = $iconMap[$evt] ?? $default;
+
+    // ── Type badge ────────────────────────────────────────────────
+    $typeMap = [
+        'room'        => ['#cfe2ff', '#084298', 'Room'],
+    ];
+    [$typeBg, $typeClr, $typeLabel] = $typeMap['room'];
+
+    // ── Human-readable label ──────────────────────────────────────
+    $label = ucwords(str_replace('_', ' ', $evt));
+
+    // ── Notes (optional) ─────────────────────────────────────────
+    $notes = $log['notes'] ?? '';
+
+    return [
+        'icon'      => $icon,
+        'color'     => $iconColor,
+        'bg'        => $iconBg,
+        'label'     => $label,
+        'typeBg'    => $typeBg,
+        'typeClr'   => $typeClr,
+        'typeLabel' => $typeLabel,
+        'notes'     => $notes,
+    ];
+}

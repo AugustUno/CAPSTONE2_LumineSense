@@ -75,7 +75,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--Bootstrap and JS CDN-->
+    <!--External links-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -83,16 +83,15 @@ $conn->close();
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <!--CSS files-->
+    <!--Relative links-->
     <link rel="icon" href="../../images/logo.png">
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="../../css/containers.css">
     <link rel="stylesheet" href="../../css/modals.css">
-    <link rel="stylesheet" href="../../css/faculty-home.css">
+    <link rel="stylesheet" href="../../css/faculty-home.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../../css/faculty-common.css">
 
     <title>Home – LumineSense</title>
-
 </head>
 
 <body class="contrast-bg">
@@ -169,24 +168,30 @@ $conn->close();
                                 <h2 class="bold">System Status</h2>
                             </div>
                         </div>
-                        <div class="gap-2">
-                            <div class="activity-list px-2 gap-2 align-items-center max-width">
-                                <h5>Lighting:
-                                    <span id="statusLighting"
-                                        class="<?= $light_status === 'on' ? 'text-success' : 'text-danger' ?>">
-                                        <?= strtoupper($light_status) ?>
+                        <div class="activity-list system-status px-2 gap-2 max-width">
+                            <?php
+                            $statuses = [
+                                ['label' => 'Server',         'ok' => true,                          'ok_text' => 'Connected',           'fail_text' => 'Disconnected'],
+                                ['label' => 'Lighting System', 'ok' => ($light_status === 'on'),      'ok_text' => 'Active',              'fail_text' => 'No active lights'],
+                                ['label' => 'Webcam',         'ok' => false,                         'ok_text' => 'Active',              'fail_text' => 'Disabled'],
+                                ['label' => 'PIR Sensor',     'ok' => false,                         'ok_text' => 'Detecting motion',    'fail_text' => 'No motion detected'],
+                            ];
+                            foreach ($statuses as $s):
+                                $is_pir_no_motion = ($s['label'] === 'PIR Sensor' && !$s['ok']);
+                                $bg_color = $is_pir_no_motion ? '#6c757d' : ($s['ok'] ? '#d1e7dd' : '#f8d7da');
+                                $text_color = $is_pir_no_motion ? '#ffffff' : ($s['ok'] ? '#0f5132' : '#842029');
+                            ?>
+                                <div class="d-flex justify-content-between align-items-center py-1" style="border-bottom:1px solid #eee;">
+                                    <h5 class="mb-0" style="font-size:13px;"><?= $s['label'] ?></h5>
+                                    <span style="font-size:12px; padding:2px 10px; border-radius:20px; font-weight:600;
+                                        background:<?= $bg_color ?>;
+                                        color:<?= $text_color ?>;">
+                                        <?= $s['ok'] ? $s['ok_text'] : $s['fail_text'] ?>
                                     </span>
-                                </h5>
-                                <h5>Server: <span class="text-success">Connected</span></h5>
-                                <h5>Webcam: <span id="statusWebcam" class="text-muted">Disabled</span></h5>
-                                <h5>PIR Sensor:
-                                    <span id="statusPir" class="text-muted">Unknown</span>
-                                </h5>
-                                <!-- PIR simulate button removed to avoid overriding live sensors -->
-                            </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-
                 </div><!-- /col 1 -->
 
 
@@ -330,49 +335,37 @@ $conn->close();
                             </div>
                         </div>
                         <div class="gap-2">
-                            <div class="activity-list px-2 gap-2 align-items-center max-width">
+                            <div class="activity-list px-2 max-width" id="activityTimeline">
                                 <?php if (empty($logs)): ?>
                                     <p class="text-muted">No recent activity yet.</p>
                                     <?php else:
-                                    foreach ($logs as $log): ?>
-                                        <div class="d-flex align-items-start gap-2" style="font-size:0.78rem; padding: 6px 0;">
-                                            <div class="flex-shrink-0">
-                                                <?php
-                                                $type = $log['event_type'] ?? '';
-                                                $badgeClass = match (true) {
-                                                    str_contains($type, 'on')      => 'bg-success',
-                                                    str_contains($type, 'off')     => 'bg-danger',
-                                                    str_contains($type, 'gesture') => 'bg-primary',
-                                                    default                        => 'bg-secondary'
-                                                };
-                                                ?>
-                                                <span class="badge <?= $badgeClass ?> rounded-pill"><?= ucfirst(str_replace('_', ' ', $type)) ?></span>
+                                    foreach ($logs as $log):
+                                        $iconData = faculty_activity_icon($log);
+                                    ?>
+                                        <div class="timeline-item">
+                                            <div class="tl-icon" style="background:<?= $iconData['bg'] ?>; color:<?= $iconData['color'] ?>;">
+                                                <i class="bi <?= $iconData['icon'] ?>"></i>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <div>
-                                                    <strong><?= htmlspecialchars($log['room_name'] ?? '—') ?></strong>
-                                                    <?php $rowAffected = $log['row_affected'] ?? null; ?>
-                                                    <?php if ($rowAffected): ?>
-                                                        <span class="badge bg-info text-dark rounded-pill ms-2">Row <?= htmlspecialchars($rowAffected) ?></span>
+                                            <div class="tl-body">
+                                                <p class="tl-action">
+                                                    <?= htmlspecialchars($iconData['label']) ?>
+                                                    <?php if (!empty($log['room_name'])): ?>
+                                                        &mdash; <span style="color:var(--secondary-color-3);"><?= htmlspecialchars($log['room_name']) ?></span>
                                                     <?php endif; ?>
+                                                </p>
+                                                <div class="tl-meta" style="flex-wrap: wrap; row-gap: 2px;">
+                                                    <span><i class="bi bi-clock"></i> <?= date('g:i A', strtotime($log['event_time'])) ?>, <?= date('M j', strtotime($log['event_time'])) ?></span>
+                                                    <?php if (!empty($log['triggered_by'])): ?>
+                                                        <span><i class="bi bi-toggle-on"></i> <?= htmlspecialchars(ucfirst($log['triggered_by'])) ?></span>
+                                                    <?php endif; ?>
+                                                    <span class="tl-type-badge" style="background:<?= $iconData['typeBg'] ?>; color:<?= $iconData['typeClr'] ?>;"><?= $iconData['typeLabel'] ?></span>
                                                 </div>
-                                                <div class="text-muted" style="font-size:0.72rem; margin-top:4px;">
-                                                    <?php
-                                                    $by = strtolower(trim($log['triggered_by'] ?? 'manual'));
-                                                    $byBadge = match ($by) {
-                                                        'gesture', 'pir' => ['bg-primary', 'bi-hand-index-thumb', 'Gesture'],
-                                                        'manual'         => ['bg-secondary', 'bi-toggle-on',      'Manual'],
-                                                        default          => ['bg-secondary', 'bi-toggle-on',      ucfirst($by)],
-                                                    };
-                                                    ?>
-                                                    <span class="badge <?= $byBadge[0] ?> rounded-pill"><i class="bi <?= $byBadge[1] ?> me-1"></i><?= $byBadge[2] ?></span>
-                                                    <span class="ms-2"><?= date('g:i A · M j', strtotime($log['event_time'])) ?></span>
-                                                </div>
+                                                <?php if (!empty($iconData['notes'])): ?>
+                                                    <span class="tl-notes"><i class="bi bi-chat-left-text me-1"></i><?= htmlspecialchars($iconData['notes']) ?></span>
+                                                <?php endif; ?>
                                             </div>
-                                        </div>
-                                        <hr>
-                                <?php endforeach;
-                                endif; ?>
+                                        </div> <?php endforeach;
+                                        endif; ?>
                             </div>
                         </div>
                     </div>
@@ -739,9 +732,7 @@ $conn->close();
                             type.includes('off') ? 'bg-danger' :
                             type.includes('gesture') ? 'bg-primary' : 'bg-secondary';
                         const by = (log.triggered_by || 'manual').toLowerCase().trim();
-                        const byBadge = (by === 'gesture' || by === 'pir') ?
-                            ['bg-primary', 'bi-hand-index-thumb', 'Gesture'] :
-                            ['bg-secondary', 'bi-toggle-on', by.charAt(0).toUpperCase() + by.slice(1)];
+                        const byBadge = (by === 'gesture' || by === 'pir') ? ['bg-primary', 'bi-hand-index-thumb', 'Gesture'] : ['bg-secondary', 'bi-toggle-on', by.charAt(0).toUpperCase() + by.slice(1)];
                         const time = new Date(log.event_time.replace(' ', 'T'));
                         const timeStr = time.toLocaleString('en-US', {
                             hour: 'numeric',

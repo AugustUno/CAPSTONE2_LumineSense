@@ -143,9 +143,9 @@ $conn->close();
 
         .slot-row {
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 1rem;
             background: #fff;
             border-radius: 8px;
             padding: 0.7rem 1rem;
@@ -154,22 +154,54 @@ $conn->close();
             width: 100%;
         }
 
+        .slot-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid #e0e0e0;
+            padding-right: 1rem;
+        }
+
+        .slot-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
         .slot-time {
             font-size: 13px;
             color: #555;
-            width: 100%;
+            text-align: center;
+        }
+
+        .slot-time hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 0.3rem 0;
+        }
+
+        .slot-time h4 {
+            font-size: 11px;
+            font-weight: 600;
+            color: #777;
+            margin: 0;
+            text-transform: uppercase;
         }
 
         .slot-room {
             font-weight: 600;
             font-size: 14px;
-            width: 100%;
+        }
+
+        .slot-subject {
+            font-size: 13px;
+            color: #666;
         }
 
         .slot-actions {
-            width: 100%;
             display: flex;
-            flex-wrap: wrap;
             gap: 0.25rem;
             align-items: center;
         }
@@ -269,33 +301,44 @@ $conn->close();
                                     $ext_status = $slot['ext_status'];
                                 ?>
                                     <div class="slot-row">
-                                        <div class="slot-time">
-                                            <?= $start ?> – <?= $end ?>
-                                            <?php if ($ext): ?>
-                                                <br><small class="text-success">Extended to <?= $ext ?></small>
-                                            <?php endif; ?>
+                                        <div class="slot-left">
+                                            <div class="slot-time">
+                                                <?php
+                                                $start_parts = explode(' ', $start);
+                                                $time_part = $start_parts[0];
+                                                $ampm = isset($start_parts[1]) ? $start_parts[1] : 'AM';
+                                                ?>
+                                                <?= $time_part ?>
+                                                <hr>
+                                                <h4><?= $ampm ?></h4>
+                                            </div>
                                         </div>
-                                        <div class="slot-room">
-                                            <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($slot['room_name']) ?>
-                                        </div>
-                                        <div class="slot-actions">
-                                            <?php if ($ext_status === 'pending'): ?>
-                                                <span class="badge-ext-pending">⏳ Pending</span>
-                                            <?php elseif ($ext_status === 'approved'): ?>
-                                                <span class="badge-ext-approved">✔ Approved</span>
-                                            <?php elseif ($ext_status === 'rejected'): ?>
-                                                <span class="badge-ext-rejected">✖ Rejected</span>
-                                                <!-- Allow re-request if rejected -->
-                                                <button class="light ms-1"
-                                                    onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
-                                                    Re-request
-                                                </button>
-                                            <?php else: ?>
-                                                <button class="light"
-                                                    onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
-                                                    Extend
-                                                </button>
-                                            <?php endif; ?>
+                                        <div class="slot-right">
+                                            <div class="slot-room">
+                                                <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($slot['room_name']) ?>
+                                            </div>
+                                            <div class="slot-subject">
+                                                Subject: Math
+                                            </div>
+                                            <div class="slot-actions">
+                                                <?php if ($ext_status === 'pending'): ?>
+                                                    <span class="badge-ext-pending">⏳ Pending</span>
+                                                <?php elseif ($ext_status === 'approved'): ?>
+                                                    <span class="badge-ext-approved">✔ Approved</span>
+                                                <?php elseif ($ext_status === 'rejected'): ?>
+                                                    <span class="badge-ext-rejected">✖ Rejected</span>
+                                                    <!-- Allow re-request if rejected -->
+                                                    <button class="light ms-1"
+                                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
+                                                        Re-request
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="light"
+                                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')">
+                                                        Extend
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
                             <?php endforeach;

@@ -16,6 +16,15 @@
     justify-content: center;
 }
 
+.parent-container-index.faculty-signup {
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .child-container {
     display: flex;
     flex-direction: column;

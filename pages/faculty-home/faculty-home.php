@@ -84,6 +84,7 @@ $conn->close();
         crossorigin="anonymous"></script>
 
     <!--CSS files-->
+    <link rel="icon" href="../../images/logo.png">
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="../../css/containers.css">
     <link rel="stylesheet" href="../../css/modals.css">

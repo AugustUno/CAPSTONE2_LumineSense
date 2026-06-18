@@ -145,9 +145,7 @@ $conn->close();
 
         .slot-row {
             display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            gap: 1rem;
+            flex-direction: column;
             background: #fff;
             border-radius: 8px;
             padding: 0.7rem 1rem;
@@ -156,32 +154,29 @@ $conn->close();
             width: 100%;
         }
 
-        .slot-left {
+        .slot-header {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-right: 1px solid #e0e0e0;
-            padding-right: 1rem;
-        }
-
-        .slot-right {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 0.5rem;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .slot-time {
-            font-size: 13px;
+            font-size: 14px;
             color: #555;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .slot-time hr {
             border: none;
             border-top: 1px solid #ddd;
-            margin: 0.3rem 0;
+            margin: 0 0.5rem;
+            flex: 1;
+            max-width: 100px;
         }
 
         .slot-time h4 {
@@ -192,26 +187,35 @@ $conn->close();
             text-transform: uppercase;
         }
 
+        .slot-actions {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .slot-content {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+            align-items: center;
+        }
+
         .slot-room {
             font-weight: 600;
             font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .slot-subject {
             font-size: 13px;
             color: var(--muted-dark);
-        
+
             span {
                 text-transform: uppercase;
                 font-size: 10px;
             }
-        }
-
-        .slot-actions {
-            display: flex;
-            gap: 0.25rem;
-            align-items: center;
-            margin-top: 0.5rem;
         }
 
         .extend-icon-btn {
@@ -346,7 +350,7 @@ $conn->close();
                                     $ext_status = $slot['ext_status'];
                                 ?>
                                     <div class="slot-row">
-                                        <div class="slot-left">
+                                        <div class="slot-header">
                                             <div class="slot-time">
                                                 <?php
                                                 // Start time
@@ -360,9 +364,10 @@ $conn->close();
                                                 $end_ampm = isset($end_parts[1]) ? $end_parts[1] : 'AM';
                                                 ?>
                                                 <?= $start_time_part ?>
+                                                <h4><?= $start_ampm ?></h4>
                                                 <hr>
                                                 <?= $end_time_part ?>
-                                                <h4><?= $start_ampm ?></h4>
+                                                <h4><?= $end_ampm ?></h4>
                                             </div>
                                             <div class="slot-actions">
                                                 <?php if ($ext_status === 'pending'): ?>
@@ -372,14 +377,14 @@ $conn->close();
                                                         <i class="bi bi-hourglass-bottom"></i>
                                                     </span>
                                                 <?php elseif ($ext_status === 'approved'): ?>
-                                                    <span class="badge-ext-approved" 
-                                                    title="Extension approved" 
+                                                    <span class="badge-ext-approved"
+                                                    title="Extension approved"
                                                     data-bs-toggle="tooltip">
                                                     <i class="bi bi-check-circle"></i>
                                                 </span>
                                                 <?php elseif ($ext_status === 'rejected'): ?>
-                                                    <span class="badge-ext-rejected" 
-                                                    title="Extension rejected" 
+                                                    <span class="badge-ext-rejected"
+                                                    title="Extension rejected"
                                                     data-bs-toggle="tooltip">
                                                     <i class="bi bi-x-circle"></i>
                                                 </span>
@@ -401,7 +406,7 @@ $conn->close();
                                                 <?php endif; ?>
                                             </div>
                                         </div>
-                                        <div class="slot-right">
+                                        <div class="slot-content">
                                             <div class="slot-room">
                                                 <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($slot['room_name']) ?>
                                             </div>

@@ -19,4 +19,4 @@ Personal Issues:
 Future Refinements:
 
 - Improve landing page
-
+- Organize/transport files for scripting and make OOP flexible for php (all those necessary)

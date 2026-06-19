@@ -102,243 +102,11 @@ $conn->close();
     <link rel="stylesheet" href="../../css/global.css">
     <link rel="stylesheet" href="../../css/containers.css">
     <link rel="stylesheet" href="../../css/tooltip.css">
+    <link rel="stylesheet" href="../../css/modals.css">
+    <link rel="stylesheet" href="../../css/faculty-timetable.css">
+    <link rel="stylesheet" href="../../css/faculty-common.css">
 
     <title>Class Schedule – LumineSense</title>
-
-    <style>
-        .weekly-schedule-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 1rem;
-            width: 100%;
-        }
-
-        .day-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 1rem;
-            min-height: 200px;
-        }
-
-        .day-card.today {
-            background: var(--secondary-color-1, #6c5ce7);
-        }
-
-        .day-card.today .day-label {
-            color: white !important;
-        }
-
-        .day-label {
-            font-weight: 700;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #9f9f9f;
-            margin-bottom: 0.5rem;
-            text-align: center;
-        }
-
-        .day-label.today {
-            color: var(--secondary-color-4, #9b00e9);
-        }
-
-        .slot-row {
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border-radius: 8px;
-            padding: 0.7rem 1rem;
-            margin-bottom: 0.4rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
-            width: 100%;
-        }
-
-        .slot-header {
-            display: flex;
-            align-items: stretch;
-            justify-content: space-between;
-            padding-bottom: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-bottom: 1px solid #e0e0e0;
-            gap: 1rem;
-        }
-
-        .slot-time-left {
-            /* display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center; NOTE": Dont delete*/
-        }
-
-        .slot-time-start {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            line-height: 1.2;
-        }
-
-        .slot-time-separator {
-            font-size: 10px;
-            color: #999;
-            margin: 2px 0;
-        }
-
-        .slot-time-end {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-            line-height: 1.2;
-        }
-
-        .slot-time-ampm {
-            color: #777;
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-
-        .slot-actions-right {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-        }
-
-        .slot-time {
-            font-size: 14px;
-            color: #555;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .slot-time hr {
-            border: none;
-            border-top: 1px solid #ddd;
-            margin: 0 0.5rem;
-            flex: 1;
-            max-width: 100px;
-        }
-
-        .slot-time h4 {
-            font-size: 11px;
-            font-weight: 600;
-            color: #777;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        .slot-actions {
-            display: flex;
-            gap: 0.25rem;
-            align-items: center;
-        }
-
-        .slot-content {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .slot-room {
-            font-weight: 600;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-        }
-
-        .slot-subject {
-            font-size: 13px;
-            color: var(--muted-dark);
-
-            span {
-                font-size: 10px;
-            }
-        }
-
-        .extend-icon-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 8px;
-            background: #e9d5ff;
-            color: var(--secondary-color-1);
-            transition: background 0.5s, color 0.2s;
-        }
-
-        .extend-icon-btn:hover {
-            background: var(--secondary-color-1);
-            color: white;
-            transform: scale(1.08);
-        }
-
-        .badge-ext-pending {
-            background: #fff3cd;
-            color: #856404;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .badge-ext-approved {
-            background: #d1e7dd;
-            color: #0f5132;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .badge-ext-rejected {
-            background: #f8d7da;
-            color: #842029;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 14px;
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .no-sched {
-            color: #ccc;
-            font-size: 13px;
-            padding: 0.3rem 0;
-            text-align: center;
-        }
-
-        @media (max-width: 1200px) {
-            .weekly-schedule-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .weekly-schedule-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .weekly-schedule-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 
 <body class="contrast-bg">
@@ -410,12 +178,24 @@ $conn->close();
                                                         data-bs-toggle="tooltip">
                                                         <i class="bi bi-hourglass-bottom"></i>
                                                     </span>
+                                                    <button class="btn-icon btn-icon-view"
+                                                        title="View Details"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="auto">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
                                                 <?php elseif ($ext_status === 'approved'): ?>
                                                     <span class="badge-ext-approved"
                                                         title="Extension approved"
                                                         data-bs-toggle="tooltip">
                                                         <i class="bi bi-check-circle"></i>
                                                     </span>
+                                                    <button class="btn-icon btn-icon-view"
+                                                        title="View Details"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="auto">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
                                                 <?php elseif ($ext_status === 'rejected'): ?>
                                                     <span class="badge-ext-rejected"
                                                         title="Extension rejected"
@@ -429,6 +209,12 @@ $conn->close();
                                                         data-bs-placement="auto">
                                                         <i class="bi bi-clock-history"></i>
                                                     </button>
+                                                    <button class="btn-icon btn-icon-view"
+                                                        title="View Details"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="auto">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
                                                 <?php else: ?>
                                                     <button class="extend-icon-btn"
                                                         onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')"
@@ -437,7 +223,12 @@ $conn->close();
                                                         data-bs-placement="auto">
                                                         <i class="bi bi-clock-history"></i>
                                                     </button>
-                                                    
+                                                    <button class="btn-icon btn-icon-view"
+                                                        title="View Details"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="auto">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
                                                 <?php endif; ?>
                                             </div>
                                         </div>

@@ -262,7 +262,10 @@ $conn->close();
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="extend-description">Request extension for <span id="extend-room"></span> at 10:30 AM/PM?<br>How many extra minutes do you need?</p>
+                        <p class="extend-description">
+                            <span class="emphasis">Request extension for <span id="extend-room"></span> at 10:30 AM/PM</span>
+                            <br>How many extra minutes do you need?
+                        </p>
                         <div class="extend-modal-content d-flex gap-4">
                             <!-- LEFT DIV: Timer -->
                             <div class="extend-left-div">
@@ -286,7 +289,7 @@ $conn->close();
                             <div class="extend-right-div d-flex flex-column align-items-center gap-3">
 
                                 <h2 class="time-elapsed-title">Extend Time</h2>
-                                <p class="extend-description p-0">Add desired time:</p>
+                                <p class="extend-description mb-0">Add desired time:</p>
 
                                 <div class="d-flex flex-column gap-2" id="extendPills">
                                     <?php foreach ([15, 30, 45, 60] as $mins): ?>

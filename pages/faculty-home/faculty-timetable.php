@@ -1,4 +1,4 @@
-<?php
+<?php 
 require_once '../../php/session_guard.php';
 check_faculty();
 require_once '../../php/db_connect.php';
@@ -251,25 +251,34 @@ $conn->close();
             </div>
         </div>
 
-        <!-- Extend Modal -->
-        <div class="notify-modal" id="extend-modal" style="display:none;">
-            <div class="modal-box">
-                <div id="modal-header">
-                    <h5><strong>⏱</strong> Request Extension</h5>
-                </div>
-                <div id="modal-body">
-                    <p id="extend-label"></p>
-                    <label>Extend by:</label>
-                    <select id="extend-mins" class="form-select mt-1">
-                        <option value="15">15 minutes</option>
-                        <option value="30" selected>30 minutes</option>
-                        <option value="45">45 minutes</option>
-                        <option value="60">1 hour</option>
-                    </select>
-                </div>
-                <div id="modal-footer">
-                    <button class="medium" onclick="submitExtend()">CONFIRM</button>
-                    <button class="medium" type="button" onclick="closeExtendModal()">CANCEL</button>
+        <!-- Request Extension Modal -->
+        <div class="profile-details-modal modal fade" id="extendModal" tabindex="-1" aria-labelledby="extendModalLabel" aria-hidden="true">
+            <div class="d-flex justify-content-center modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title bold" id="extendModalLabel">
+                            <i class="bi bi-clock-history me-2"></i>Request Time Extension
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small mb-3" id="extend-label">
+                            How many extra minutes do you need?
+                        </p>
+                        <div class="d-flex gap-2 justify-content-center flex-wrap" id="extendPills">
+                            <?php foreach ([15, 30, 45, 60] as $mins): ?>
+                                <button class="btn btn-outline-primary extend-pill" data-mins="<?= $mins ?>">
+                                    +<?= $mins ?> min
+                                </button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="submitExtendBtn" disabled>
+                            Send Request
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -289,31 +298,53 @@ $conn->close();
     </div>
 
     <script>
+        // Initialize Bootstrap modal for extend request
+        const extendModalEl = document.getElementById('extendModal');
+        const extendModal = new bootstrap.Modal(extendModalEl);
+
         let currentScheduleId = null;
 
         function requestExtend(scheduleId, room, time) {
             currentScheduleId = scheduleId;
-            document.getElementById('extend-label').textContent = `Request extension for ${room} at ${time}?`;
-            const modal = document.getElementById('extend-modal');
-            modal.style.display = 'flex';
-            // Trigger reflow to ensure transition works
-            modal.offsetHeight;
-            modal.classList.add('active');
+            document.getElementById('extend-label').textContent = `Request extension for ${room} at ${time}? How many extra minutes do you need?`;
+            document.getElementById('submitExtendBtn').disabled = true;
+
+            // Reset pills
+            document.querySelectorAll('.extend-pill').forEach(btn => {
+                btn.classList.remove('active', 'btn-primary');
+                btn.classList.add('btn-outline-primary');
+            });
+
+            extendModal.show();
         }
 
-        function closeExtendModal() {
-            const modal = document.getElementById('extend-modal');
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-        }
+        // Handle pill selection
+        document.querySelectorAll('.extend-pill').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.extend-pill').forEach(b => {
+                    b.classList.remove('active', 'btn-primary');
+                    b.classList.add('btn-outline-primary');
+                });
+                btn.classList.add('active', 'btn-primary');
+                btn.classList.remove('btn-outline-primary');
+                document.getElementById('submitExtendBtn').disabled = false;
+            });
+        });
 
-        function submitExtend() {
-            document.getElementById('extend-schedule-id').value = currentScheduleId;
-            document.getElementById('extend-mins-val').value = document.getElementById('extend-mins').value;
-            document.getElementById('extend-form').submit();
-        }
+        // Handle submit button click
+        document.getElementById('submitExtendBtn').addEventListener('click', () => {
+            const selectedPill = document.querySelector('.extend-pill.active');
+            if (selectedPill) {
+                document.getElementById('extend-schedule-id').value = currentScheduleId;
+                document.getElementById('extend-mins-val').value = selectedPill.dataset.mins;
+                document.getElementById('extend-form').submit();
+            }
+        });
+
+        // Close modal on hide
+        extendModalEl.addEventListener('hidden.bs.modal', () => {
+            currentScheduleId = null;
+        });
     </script>
 </body>
 

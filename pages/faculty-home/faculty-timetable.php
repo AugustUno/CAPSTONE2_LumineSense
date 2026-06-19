@@ -294,11 +294,19 @@ $conn->close();
         function requestExtend(scheduleId, room, time) {
             currentScheduleId = scheduleId;
             document.getElementById('extend-label').textContent = `Request extension for ${room} at ${time}?`;
-            document.getElementById('extend-modal').style.display = 'flex';
+            const modal = document.getElementById('extend-modal');
+            modal.style.display = 'flex';
+            // Trigger reflow to ensure transition works
+            modal.offsetHeight;
+            modal.classList.add('active');
         }
 
         function closeExtendModal() {
-            document.getElementById('extend-modal').style.display = 'none';
+            const modal = document.getElementById('extend-modal');
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
         }
 
         function submitExtend() {

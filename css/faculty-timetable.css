@@ -255,3 +255,123 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Request Time Extension Modal Styles */
+.extend-modal-content {
+    width: 100%;
+}
+
+.extend-left-div {
+    flex: 1;
+    min-width: 200px;
+}
+
+.extend-right-div {
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.time-elapsed-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.timer-display {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.timer-input {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #f8f9fa;
+    color: #333;
+    padding: 0.25rem;
+}
+
+.timer-input:focus {
+    outline: none;
+    border-color: var(--secondary-color-1, #6c5ce7);
+    background: #fff;
+}
+
+.timer-labels {
+    margin-top: 0.5rem;
+}
+
+.timer-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.extend-description {
+    font-size: 0.85rem;
+    color: #555;
+    text-align: center;
+    line-height: 1.4;
+    margin-top: 1rem !important;
+}
+
+#extendPills {
+    width: 100%;
+}
+
+#extendPills .extend-pill {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+#extendPills .extend-pill:hover {
+    transform: scale(1.05);
+}
+
+#extendPills .extend-pill.active {
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+
+@media (max-width: 576px) {
+    .extend-modal-content {
+        flex-direction: column;
+        gap: 1.5rem !important;
+    }
+    
+    .extend-right-div {
+        order: -1;
+    }
+    
+    .timer-display {
+        font-size: 1.5rem;
+    }
+    
+    .timer-input {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}

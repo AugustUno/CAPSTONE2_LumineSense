@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once '../../php/session_guard.php';
 check_faculty();
 require_once '../../php/db_connect.php';
@@ -262,6 +262,7 @@ $conn->close();
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
+                        <p class="extend-description">Request extension for <span id="extend-room"></span> at 10:30 AM/PM?<br>How many extra minutes do you need?</p>
                         <div class="extend-modal-content d-flex gap-4">
                             <!-- LEFT DIV: Timer -->
                             <div class="extend-left-div">
@@ -280,9 +281,13 @@ $conn->close();
                                     Extending time for Math discussion at <span id="extend-room"></span> for <span id="extend-time-range"></span>
                                 </p>
                             </div>
-                            
+
                             <!-- RIGHT DIV: Extend Buttons -->
-                            <div class="extend-right-div">
+                            <div class="extend-right-div d-flex flex-column align-items-center gap-3">
+
+                                <h2 class="time-elapsed-title">Extend Time</h2>
+                                <p class="extend-description p-0">Add desired time:</p>
+
                                 <div class="d-flex flex-column gap-2" id="extendPills">
                                     <?php foreach ([15, 30, 45, 60] as $mins): ?>
                                         <button class="btn btn-outline-primary extend-pill" data-mins="<?= $mins ?>">
@@ -380,7 +385,7 @@ $conn->close();
         function updateDescription() {
             const totalSeconds = getTotalSecondsFromInputs();
             const extraMinutes = Math.floor(totalSeconds / 60);
-            
+
             if (currentEndTime) {
                 const endDateTime = parseTime(currentEndTime);
                 endDateTime.setMinutes(endDateTime.getMinutes() + extraMinutes);
@@ -409,7 +414,7 @@ $conn->close();
             currentRoom = room;
             currentStartTime = startTime;
             currentEndTime = endTime;
-            
+
             document.getElementById('submitExtendBtn').disabled = true;
 
             // Reset pills
@@ -429,7 +434,7 @@ $conn->close();
             btn.addEventListener('click', () => {
                 const minsToAdd = parseInt(btn.dataset.mins);
                 totalExtensionMinutes += minsToAdd;
-                
+
                 // Update visual state of buttons
                 document.querySelectorAll('.extend-pill').forEach(b => {
                     b.classList.remove('active', 'btn-primary');
@@ -437,15 +442,15 @@ $conn->close();
                 });
                 btn.classList.add('active', 'btn-primary');
                 btn.classList.remove('btn-outline-primary');
-                
+
                 // Update timer display
                 const baseElapsedSeconds = calculateElapsedMinutes(currentStartTime, currentEndTime) * 60;
                 const newTotalSeconds = baseElapsedSeconds + (totalExtensionMinutes * 60);
                 updateTimerDisplay(newTotalSeconds);
-                
+
                 // Update description
                 updateDescription();
-                
+
                 document.getElementById('submitExtendBtn').disabled = false;
             });
         });
@@ -455,17 +460,17 @@ $conn->close();
             input.addEventListener('input', (e) => {
                 // Remove non-numeric characters
                 e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                
+
                 // Limit to 2 digits
                 if (e.target.value.length > 2) {
                     e.target.value = e.target.value.slice(0, 2);
                 }
-                
+
                 // Ensure at least 2 digits with leading zero
                 if (e.target.value.length === 1) {
                     e.target.value = '0' + e.target.value;
                 }
-                
+
                 // Validate ranges
                 if (e.target.id === 'timer-hours') {
                     let val = parseInt(e.target.value) || 0;
@@ -480,7 +485,7 @@ $conn->close();
                     if (val > 59) val = 59;
                     e.target.value = val.toString().padStart(2, '0');
                 }
-                
+
                 updateDescription();
             });
 
@@ -495,7 +500,7 @@ $conn->close();
             const totalSeconds = getTotalSecondsFromInputs();
             const elapsedMinutes = calculateElapsedMinutes(currentStartTime, currentEndTime);
             const extensionMinutes = Math.floor(totalSeconds / 60) - elapsedMinutes;
-            
+
             if (extensionMinutes > 0) {
                 document.getElementById('extend-schedule-id').value = currentScheduleId;
                 document.getElementById('extend-mins-val').value = extensionMinutes;

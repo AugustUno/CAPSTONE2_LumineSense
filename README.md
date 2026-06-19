@@ -16,3 +16,7 @@ Personal Issues:
 
 - PHPMailer seems to have errors on me when developing -G
 
+Future Refinements:
+
+- Improve landing page
+

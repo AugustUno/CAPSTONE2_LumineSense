@@ -103,7 +103,6 @@ $conn->close();
     <link rel="stylesheet" href="../../css/containers.css">
     <link rel="stylesheet" href="../../css/tooltip.css">
 
-
     <title>Class Schedule – LumineSense</title>
 
     <style>
@@ -156,11 +155,51 @@ $conn->close();
 
         .slot-header {
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: space-between;
             padding-bottom: 0.5rem;
             margin-bottom: 0.5rem;
             border-bottom: 1px solid #e0e0e0;
+            gap: 1rem;
+        }
+
+        .slot-time-left {
+            /* display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; NOTE": Dont delete*/
+        }
+
+        .slot-time-start {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            line-height: 1.2;
+        }
+
+        .slot-time-separator {
+            font-size: 10px;
+            color: #999;
+            margin: 2px 0;
+        }
+
+        .slot-time-end {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            line-height: 1.2;
+        }
+
+        .slot-time-ampm {
+            color: #777;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .slot-actions-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
         }
 
         .slot-time {
@@ -195,9 +234,7 @@ $conn->close();
 
         .slot-content {
             display: flex;
-            flex-direction: row;
-            gap: 1rem;
-            align-items: center;
+            flex-direction: column;
         }
 
         .slot-room {
@@ -205,7 +242,6 @@ $conn->close();
             font-size: 18px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
         }
 
         .slot-subject {
@@ -213,7 +249,6 @@ $conn->close();
             color: var(--muted-dark);
 
             span {
-                text-transform: uppercase;
                 font-size: 10px;
             }
         }
@@ -351,7 +386,7 @@ $conn->close();
                                 ?>
                                     <div class="slot-row">
                                         <div class="slot-header">
-                                            <div class="slot-time">
+                                            <div class="slot-time-left">
                                                 <?php
                                                 // Start time
                                                 $start_parts = explode(' ', $start);
@@ -363,13 +398,12 @@ $conn->close();
                                                 $end_time_part = $end_parts[0];
                                                 $end_ampm = isset($end_parts[1]) ? $end_parts[1] : 'AM';
                                                 ?>
-                                                <?= $start_time_part ?>
-                                                <h4><?= $start_ampm ?></h4>
-                                                <hr>
-                                                <?= $end_time_part ?>
-                                                <h4><?= $end_ampm ?></h4>
+                                                <span class="slot-time-start"><?= $start_time_part ?></span>
+                                                <span class="slot-time-separator">TO</span>
+                                                <span class="slot-time-end"><?= $end_time_part ?></span>
+                                                <span class="slot-time-ampm"><?= $end_ampm ?></span>
                                             </div>
-                                            <div class="slot-actions">
+                                            <div class="slot-actions-right">
                                                 <?php if ($ext_status === 'pending'): ?>
                                                     <span class="badge-ext-pending"
                                                         title="Extension request pending"
@@ -378,21 +412,21 @@ $conn->close();
                                                     </span>
                                                 <?php elseif ($ext_status === 'approved'): ?>
                                                     <span class="badge-ext-approved"
-                                                    title="Extension approved"
-                                                    data-bs-toggle="tooltip">
-                                                    <i class="bi bi-check-circle"></i>
-                                                </span>
+                                                        title="Extension approved"
+                                                        data-bs-toggle="tooltip">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </span>
                                                 <?php elseif ($ext_status === 'rejected'): ?>
                                                     <span class="badge-ext-rejected"
-                                                    title="Extension rejected"
-                                                    data-bs-toggle="tooltip">
-                                                    <i class="bi bi-x-circle"></i>
-                                                </span>
-                                                <button class="extend-icon-btn"
-                                                    onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')"
-                                                    title="Re-request Extension"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="auto">
+                                                        title="Extension rejected"
+                                                        data-bs-toggle="tooltip">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </span>
+                                                    <button class="extend-icon-btn"
+                                                        onclick="requestExtend(<?= $slot['id'] ?>, '<?= $slot['room_name'] ?>', '<?= $start ?>')"
+                                                        title="Re-request Extension"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="auto">
                                                         <i class="bi bi-clock-history"></i>
                                                     </button>
                                                 <?php else: ?>
@@ -403,6 +437,7 @@ $conn->close();
                                                         data-bs-placement="auto">
                                                         <i class="bi bi-clock-history"></i>
                                                     </button>
+                                                    
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -410,8 +445,9 @@ $conn->close();
                                             <div class="slot-room">
                                                 <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($slot['room_name']) ?>
                                             </div>
-                                            <div class="slot-subject">
-                                               <span>subject</span><h5>Math</h5>
+                                            <div class="slot-subject d-flex flex-row">
+                                                <i class="bi bi-book me-1"></i>
+                                                <h5>Math</h5>
                                             </div>
                                         </div>
                                     </div>

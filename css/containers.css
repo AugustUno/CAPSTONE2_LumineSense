@@ -223,6 +223,20 @@
     }
 }
 
+.main-container.faculty-timetable {
+    display: flex;
+    padding: 2rem;
+    gap: 3rem;
+
+    .group-container:first-child {
+        flex: 2;
+    }
+
+    .group-container:last-child {
+        flex: 0.5;
+    }
+}
+
 /* Equal-width columns for the 3-column readings page */
 .main-container.homepage.readings .group-container:first-child,
 .main-container.homepage.readings .group-container:last-child,
@@ -444,6 +458,7 @@
 }
 
 
+
 /* Responsive timer font so large clocks don't overflow their container */
 .section-container .display-1 {
     font-size: clamp(2.5rem, 6vw, 5.5rem);
@@ -477,6 +492,10 @@
     border-radius: 10px;
     min-height: 30vh;
     max-width: 45vh;
+}
+
+.section-container.timetable {
+    border-left: 5px solid var(--secondary-color-1);
 }
 
 .section-topbar {
@@ -708,5 +727,6 @@ h4.bold.off {
     transform: translateY(-50%);
     color: #888;
 }
+
 
 /* end styles */

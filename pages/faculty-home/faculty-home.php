@@ -288,7 +288,7 @@ $conn->close();
                     <!-- Time Left (moved from Column 2) -->
                     <div style="background-color: #f8f9fa;" class="section-container mb-3">
                         <div class="gap-1 align-items-center">
-                            <div class="section-topbar d-flex flex-columnmx-2 justify-content-between">
+                            <div class="section-topbar mx-2 justify-content-between">
                                 <div>
                                     <h2 class="bold">Time Left</h2>
                                     <h2 class="medium fs-6">until end of class</h2>

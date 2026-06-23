@@ -75,12 +75,38 @@ $r = $conn->query("
 ");
 while ($row = $r->fetch_assoc()) {
     $schedule_by_day[$row['day_of_week']][] = $row;
-    // Check current schedule
-    if ($row['day_of_week'] === $today && $now >= $row['start_time'] && $now <= $row['end_time']) {
-        $current_sched = $row['room_name'] . ' · '
-            . date('g:i A', strtotime($row['start_time'])) . ' - '
-            . date('g:i A', strtotime($row['end_time']));
-    }
+}
+
+// ── Active schedule for timer (for Time Left widget) ─────────────────────────
+$fid      = (int)$faculty_id;
+$today_e  = $conn->real_escape_string($today);
+$now_e    = $conn->real_escape_string($now);
+
+$r = $conn->query("
+    SELECT s.id, s.start_time, s.end_time, s.extended_until, c.room_name
+    FROM schedules s
+    JOIN classrooms c ON c.id = s.classroom_id
+    WHERE s.faculty_id = $fid
+      AND s.day_of_week = '$today_e'
+      AND s.start_time <= '$now_e'
+      AND (s.extended_until >= '$now_e' OR (s.extended_until IS NULL AND s.end_time >= '$now_e'))
+    ORDER BY s.start_time
+    LIMIT 1
+");
+$active_schedule = ($r && $r->num_rows > 0) ? $r->fetch_assoc() : null;
+
+// Build schedules array for View Schedule modal
+$schedules = [];
+$r2 = $conn->query("
+    SELECT s.id, s.day_of_week, s.start_time, s.end_time, c.room_name
+    FROM schedules s
+    JOIN classrooms c ON c.id = s.classroom_id
+    WHERE s.created_by = $faculty_id
+    ORDER BY FIELD(s.day_of_week,'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'),
+             s.start_time
+");
+while ($row = $r2->fetch_assoc()) {
+    $schedules[] = $row;
 }
 
 $conn->close();
@@ -115,8 +141,67 @@ $conn->close();
         <?php include '../../php/includes/faculty-topbar.php'; ?>
 
         <div class="child-container mb-3">
-            <div class="main-container homepage">
-                skfdhksdfhsjkdfhs
+            <div class="main-container faculty-timetable">
+                <!-- Time Left -->
+                <div style="background-color: #f8f9fa;" class="section-container timetable mb-3">
+                    <div class="gap-1 align-items-center  d-flex flex-row">
+                        <div class="section-topbar mx-2 justify-content-between">
+                            <div>
+                                <h2 class="bold">Time Left</h2>
+                                <h2 class="medium fs-6">until end of class</h2>
+                            </div>
+                            <div class="d-flex mx-2 align-items-center justify-content-end">
+                                <!-- <button class="light h-50 w-auto" data-bs-toggle="modal" data-bs-target="#viewScheduleModal">View Schedule</button> -->
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column mx-1 align-items-center justify-content-center">
+                            <?php if ($active_schedule): ?>
+                                <?php
+                                $end = $active_schedule['extended_until'] ?? $active_schedule['end_time'];
+                                ?>
+                                <h1 class="bold display-1" id="timerDisplay" data-end="<?= htmlspecialchars($end) ?>">
+                                    --:--:--
+                                </h1>
+                            <?php else: ?>
+                                <h1 class="bold display-1 text-muted" style="font-size: 5rem;" id="timerDisplay">00:00:00</h1>
+                            <?php endif; ?>
+                        </div>
+                        <div class="d-flex flex-column mx-2 align-items-end justify-content-center">
+                            <?php if ($active_schedule): ?>
+                                <button class="light mt-2" data-bs-toggle="modal" data-bs-target="#extendModal">
+                                    <i class="bi bi-clock-history me-1"></i> Extend
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <?php if (!$active_schedule): ?>
+                        <p class="text-muted text-center mt-2 mb-1">No active class schedule right now.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Current Schedule/Subject -->
+                <div style="background-color: #f8f9fa;" class="section-container mb-3">
+                    <div class="gap-1 align-items-center">
+                        <div class="section-topbar d-flex flex-row mx-2 justify-content-between">
+                            <div>
+                                <h2 class="bold">Current Class</h2>
+                                <h2 class="medium fs-6">Subject: <?= htmlspecialchars($active_schedule['subject'] ?? 'N/A') ?></h2>
+                                <h2 class="medium fs-6">Room: <?= htmlspecialchars($active_schedule['room_name'] ?? 'N/A') ?></h2>
+                            </div>
+                            <div class="d-flex mx-2 align-items-center justify-content-end">
+                                <!-- <button class="light h-50 w-auto" data-bs-toggle="modal" data-bs-target="#viewScheduleModal">View Schedule</button> -->
+                            </div>
+                        </div>
+                        <div class="d-flex flex-column mx-1 align-items-center justify-content-center">
+                            <div>
+                                <h2 class="bold">Next Class</h2>
+                                <h2 class="medium fs-6">Subject: <?= htmlspecialchars($active_schedule['subject'] ?? 'N/A') ?></h2>
+                                <h2 class="medium fs-6">Room: <?= htmlspecialchars($active_schedule['room_name'] ?? 'N/A') ?></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -572,7 +657,115 @@ $conn->close();
             currentEndTime = '';
             totalExtensionMinutes = 0;
         });
+
+        // ── Countdown timer for Time Left widget ───────────────────────────────
+        let _scheduleEnd = null;
+        (function() {
+            const display = document.getElementById('timerDisplay');
+            const phpEnd = display ? display.dataset.end : null;
+            if (phpEnd) _scheduleEnd = phpEnd;
+
+            function pad(n) {
+                return String(n).padStart(2, '0');
+            }
+
+            window._tickTimer = function() {
+                if (!display) return;
+                if (!_scheduleEnd) {
+                    display.textContent = '00:00:00';
+                    display.classList.remove('text-danger');
+                    return;
+                }
+                const now = new Date();
+                const [h, m, s] = _scheduleEnd.split(':').map(Number);
+                const end = new Date(now);
+                end.setHours(h, m, s, 0);
+                let diff = Math.max(0, Math.floor((end - now) / 1000));
+                display.textContent = `${pad(Math.floor(diff / 3600))}:${pad(Math.floor((diff % 3600) / 60))}:${pad(diff % 60)}`;
+                if (diff === 0) {
+                    display.classList.add('text-danger');
+                } else {
+                    display.classList.remove('text-danger');
+                }
+            };
+            window._tickTimer();
+            setInterval(window._tickTimer, 1000);
+        })();
     </script>
+
+    <!-- View Schedule Modal -->
+    <div class="modal fade" id="viewScheduleModal" tabindex="-1" aria-labelledby="viewScheduleLabel" aria-hidden="true">
+        <div class="d-flex justify-content-center modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title bold" id="viewScheduleLabel">
+                        <i class="bi bi-calendar-week me-2"></i>Class Schedule
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-column gap-3">
+                        <?php if (!empty($schedules)): ?>
+                            <?php
+                            $dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                            usort($schedules, function ($a, $b) use ($dayOrder) {
+                                $da = array_search($a['day_of_week'], $dayOrder);
+                                $db = array_search($b['day_of_week'], $dayOrder);
+                                return $da !== $db ? $da - $db : strcmp($a['start_time'], $b['start_time']);
+                            });
+                            $dayIcons = [
+                                'Monday'    => 'bi-1-square-fill',
+                                'Tuesday'   => 'bi-2-square-fill',
+                                'Wednesday' => 'bi-3-square-fill',
+                                'Thursday'  => 'bi-4-square-fill',
+                                'Friday'    => 'bi-5-square-fill',
+                                'Saturday'  => 'bi-6-square-fill',
+                                'Sunday'    => 'bi-7-square-fill',
+                            ];
+                            $today = date('l');
+                            foreach ($schedules as $sched):
+                                $isToday  = ($sched['day_of_week'] === $today);
+                                $icon     = $dayIcons[$sched['day_of_week']] ?? 'bi-calendar';
+                                $start    = date('g:i A', strtotime($sched['start_time']));
+                                $end      = date('g:i A', strtotime($sched['end_time']));
+                            ?>
+                                <div class="d-flex align-items-center gap-3 p-2 rounded-3
+                                <?= $isToday ? 'bg-primary bg-opacity-10 border border-primary border-opacity-25' : 'bg-light' ?>">
+                                    <i class="bi <?= $icon ?> <?= $isToday ? 'text-primary' : 'text-secondary' ?>"
+                                        style="font-size:1.6rem; flex-shrink:0;"></i>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong><?= htmlspecialchars($sched['day_of_week']) ?></strong>
+                                            <?php if ($isToday): ?>
+                                                <span class="badge bg-primary rounded-pill" style="font-size:0.7rem;">Today</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i><?= $start ?> — <?= $end ?>
+                                        </small>
+                                        <?php if (!empty($sched['room_name'])): ?>
+                                            <div style="font-size:0.8rem;" class="text-secondary">
+                                                <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($sched['room_name']) ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="d-flex align-items-center gap-3 p-2 bg-light rounded-3 text-muted">
+                                <i class="bi bi-calendar-x" style="font-size:1.6rem;"></i>
+                                <div>No schedules found.</div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

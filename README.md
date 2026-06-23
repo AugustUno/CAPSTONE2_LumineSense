@@ -1,6 +1,7 @@
 | Date | Modules Affected | Notes |
 | :--- | :---: | :--- |
-| June 23 | Faculty Timetable | <ul><li>BACKEND NEEDS:</li></ul> | 
+| June 17 | Directory Restructuring & Path Refactoring | <ul><li>Moved files from root to subdirectories (`css/`, `script/`, `pages/`, `python/`, `misc/`)</li><li>Refactored stand-alone `api/` scripts into OOP controllers under `app/controllers/`</li><li>Fixed all broken asset paths, fetch URLs, and spawned script paths across JS, Python, and ESP32 firmware</li></ul> |
+| June 23 | Faculty Timetable | <ul><li>BACKEND NEEDS: Subject name per schedule as assigned by Faculty Head (FH)</li></ul> | 
 
 Backend Needs:
 

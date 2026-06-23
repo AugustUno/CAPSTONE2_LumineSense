@@ -788,7 +788,7 @@ $conn->close();
                         <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3" id="slot-extension-row">
                             <i class="bi bi-hourglass-split text-primary" style="font-size:1.6rem; flex-shrink:0;"></i>
                             <div class="flex-grow-1">
-                                <strong>Extended Until</strong>
+                                <strong>Subject</strong>
                                 <div id="slot-extension" class="text-muted"></div>
                             </div>
                         </div>

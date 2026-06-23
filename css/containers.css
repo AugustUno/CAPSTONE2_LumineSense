@@ -224,9 +224,23 @@
 }
 
 .main-container.faculty-timetable {
+    background-color: var(--secondary-color-2);
     display: flex;
-    padding: 2rem;
-    gap: 3rem;
+    padding: 1rem;
+    gap: 2rem;
+
+    .group-container:first-child {
+        flex: 2;
+    }
+
+    .group-container:last-child {
+        flex: 0.5;
+    }
+}
+
+.main-container.faculty-timetable-heading {
+    display: flex;
+    padding: 0.5rem;
 
     .group-container:first-child {
         flex: 2;
@@ -457,6 +471,11 @@
     width: 100%;
 }
 
+.subsection-container {
+    background-color: var(--secondary-color-1);
+    border-radius: 8px;
+}
+
 
 
 /* Responsive timer font so large clocks don't overflow their container */
@@ -496,6 +515,8 @@
 
 .section-container.timetable {
     border-left: 5px solid var(--secondary-color-1);
+    box-shadow: 0 8px 32px rgba(47, 0, 79, 0.18);
+    height: 30vh;
 }
 
 .section-topbar {

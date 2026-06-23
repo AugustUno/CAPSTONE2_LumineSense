@@ -294,7 +294,7 @@ $conn->close();
                                     <h2 class="medium fs-6">until end of class</h2>
                                 </div>
                                 <div class="d-flex mx-2 align-items-center justify-content-end">
-                                    <button class="light h-50 w-auto" data-bs-toggle="modal" data-bs-target="#viewScheduleModal">View Schedule</button>
+                                    <button class="light h-50 w-auto" data-bs-toggle="modal" onclick="dissolve('faculty-timetable.php')">View Schedule</button>
                                 </div>
                             </div>
                             <div class="d-flex flex-column mx-1 align-items-center justify-content-center">

@@ -141,68 +141,98 @@ $conn->close();
         <?php include '../../php/includes/faculty-topbar.php'; ?>
 
         <div class="child-container mb-3">
-            <div class="main-container faculty-timetable">
+
+            <div class="main-container faculty-timetable-heading d-flex flex-column align-items-center justify-content-center w-auto mb-3">
+                <h2 class="bold">Class Timetable for <?= $faculty_name ?></h2>
+                <p>Effective A.Y. <?= date('Y').'-'.(date('Y') + 1) ?> • Prepared by: Faculty Head <span class="bold" style="color: var(--secondary-color-2);">Charlie Ampatuan</span> • 
+                    <span style="color: var(--secondary-color-2);">
+                        Today is the
+                        <span class="bold"><?= date('jS') ?></span> day of the month of
+                        <span class="bold"><?= date('F') ?></span>, S.Y.
+                        <span class="bold"><?= date('Y') ?></span>
+                    </span>
+                </p>
+                <!--Note: Faculty Head is static-->
+            </div>
+
+            <div class="main-container faculty-timetable w-auto">
                 <!-- Time Left -->
                 <div style="background-color: #f8f9fa;" class="section-container timetable mb-3">
-                    <div class="gap-1 align-items-center  d-flex flex-row">
-                        <div class="section-topbar mx-2 justify-content-between">
-                            <div>
-                                <h2 class="bold">Time Left</h2>
-                                <h2 class="medium fs-6">until end of class</h2>
-                            </div>
-                            <div class="d-flex mx-2 align-items-center justify-content-end">
-                                <!-- <button class="light h-50 w-auto" data-bs-toggle="modal" data-bs-target="#viewScheduleModal">View Schedule</button> -->
-                            </div>
+                    <div class="section-topbar mx-2 justify-content-between">
+                        <div>
+                            <h2 class="bold"><i class="bi bi-clock me-1"></i>Time Left <span class="medium text-muted fs-6">until end of class</span></h2>
+                            <!-- <h2 class="medium text-muted fs-6" style="font-size: 14px;"><i class="bi bi-info-circle me-1"></i>Today is <span class="bold">Monday, October 2nd, 2023</span></h2> -->
                         </div>
-                        <div class="d-flex flex-column mx-1 align-items-center justify-content-center">
+                        <div class="d-flex mx-2 align-items-center justify-content-end">
+                            <!-- <button class="light h-50 w-auto" data-bs-toggle="modal" data-bs-target="#viewScheduleModal">View Schedule</button> -->
+                        </div>
+                    </div>
+                    <div class="gap-1 align-items-center  d-flex flex-column">
+
+                        <div class="subsection-container d-flex flex-column mx-1 align-items-center justify-content-center">
                             <?php if ($active_schedule): ?>
                                 <?php
                                 $end = $active_schedule['extended_until'] ?? $active_schedule['end_time'];
                                 ?>
-                                <h1 class="bold display-1" id="timerDisplay" data-end="<?= htmlspecialchars($end) ?>">
+                                <h1 class="bold display-1 p-2" style="color: var(--muted-white);" id="timerDisplay" data-end="<?= htmlspecialchars($end) ?>">
                                     --:--:--
                                 </h1>
                             <?php else: ?>
-                                <h1 class="bold display-1 text-muted" style="font-size: 5rem;" id="timerDisplay">00:00:00</h1>
+                                <h1 class="bold display-1 p-2" style="font-size: 5rem; color: var(--muted-white);" id="timerDisplay">00:00:00</h1>
                             <?php endif; ?>
                         </div>
                         <div class="d-flex flex-column mx-2 align-items-end justify-content-center">
                             <?php if ($active_schedule): ?>
-                                <button class="light mt-2" data-bs-toggle="modal" data-bs-target="#extendModal">
+                                <?php
+                                $end = $active_schedule['extended_until'] ?? $active_schedule['end_time'];
+                                $start_12h = date('g:i A', strtotime($active_schedule['start_time']));
+                                $end_12h = date('g:i A', strtotime($end));
+                                ?>
+                                <button class="light mt-2" onclick="requestExtend(<?= $active_schedule['id'] ?>, '<?= htmlspecialchars($active_schedule['room_name']) ?>', '<?= $start_12h ?>', '<?= $end_12h ?>')">
                                     <i class="bi bi-clock-history me-1"></i> Extend
                                 </button>
                             <?php endif; ?>
-                        </div>
-                    </div>
 
-                    <?php if (!$active_schedule): ?>
-                        <p class="text-muted text-center mt-2 mb-1">No active class schedule right now.</p>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Current Schedule/Subject -->
-                <div style="background-color: #f8f9fa;" class="section-container mb-3">
-                    <div class="gap-1 align-items-center">
-                        <div class="section-topbar d-flex flex-row mx-2 justify-content-between">
-                            <div>
-                                <h2 class="bold">Current Class</h2>
-                                <h2 class="medium fs-6">Subject: <?= htmlspecialchars($active_schedule['subject'] ?? 'N/A') ?></h2>
-                                <h2 class="medium fs-6">Room: <?= htmlspecialchars($active_schedule['room_name'] ?? 'N/A') ?></h2>
-                            </div>
-                            <div class="d-flex mx-2 align-items-center justify-content-end">
-                                <!-- <button class="light h-50 w-auto" data-bs-toggle="modal" data-bs-target="#viewScheduleModal">View Schedule</button> -->
-                            </div>
-                        </div>
-                        <div class="d-flex flex-column mx-1 align-items-center justify-content-center">
-                            <div>
-                                <h2 class="bold">Next Class</h2>
-                                <h2 class="medium fs-6">Subject: <?= htmlspecialchars($active_schedule['subject'] ?? 'N/A') ?></h2>
-                                <h2 class="medium fs-6">Room: <?= htmlspecialchars($active_schedule['room_name'] ?? 'N/A') ?></h2>
-                            </div>
+                            <?php if (!$active_schedule): ?>
+                                <p class="text-muted text-center mt-2 mb-1">No active class schedule right now.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
+
+                <!-- Current and Next Class | Static -->
+                <div style="background-color: #f8f9fa;" class="section-container timetable ">
+                    <div class="section-topbar d-flex flex-column mx-2 justify-content-between">
+                        <div>
+                            <h2 class="bold"><i class="bi bi-info-circle me-1"></i>Class Details</h2>
+                            <!-- <h2 class="medium text-muted" style="font-size: 14px;"><i class="bi bi-person me-1"></i>assigned by Faculty Head<span class="bold"> Charlie Mondragon</span></h2> -->
+                        </div>
+                        <div class="d-flex mx-2 align-items-center justify-content-end">
+                            <!-- <button class="light h-50 w-auto" data-bs-toggle="modal" data-bs-target="#viewScheduleModal">View Schedule</button> -->
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row mx-1 gap-3 align-items-center justify-content-center mb-3">
+                        <div class="subsection-container p-3">
+                            <h2 class="bold text-uppercase" style="color: #fff;">Current</h2>
+                            <h2 class="medium fs-6" style="color: #fff;"><i class="bi bi-door-open me-1"></i>Room: <?= htmlspecialchars($active_schedule['room_name'] ?? 'N/A') ?></h2>
+                            <h2 class="medium fs-6" style="color: #fff;"><i class="bi bi-book me-1"></i>Subject: <?= htmlspecialchars($active_schedule['subject'] ?? 'N/A') ?></h2>
+                        </div>
+                        <div>
+                            <h2 class="bold text-uppercase" style="font-size: 14px;">Next</h2>
+                            <h2 class="medium fs-6" style="font-size: 14px;"><i class="bi bi-door-open me-1"></i>Room: <?= htmlspecialchars($active_schedule['room_name'] ?? 'N/A') ?></h2>
+                            <h2 class="medium fs-6" style="font-size: 14px;"><i class="bi bi-book me-1"></i>Subject: <?= htmlspecialchars($active_schedule['subject'] ?? 'N/A') ?></h2>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Sent Requests | Static -->
+                <div style="background-color: #f8f9fa;" class="section-container timetable d-flex flex-row mx-1 gap-3 align-items-center justify-content-center mb-3">
+
+                </div>
+
             </div>
+
         </div>
 
         <div class="child-container">

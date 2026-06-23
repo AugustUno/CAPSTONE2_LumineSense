@@ -42,9 +42,9 @@
         const page = window.location.pathname.split('/').pop();
         const map = {
             'faculty-home.php': 0,
-            'faculty-readings.php': 1,
-            'faculty-timetable.php': 2,
-            'faculty-profile-settings.php': 3,
+            // 'faculty-readings.php': 1,
+            'faculty-timetable.php': 1,
+            'faculty-profile-settings.php': 2,
         };
         const index = map[page];
         if (index !== null && index !== undefined) {

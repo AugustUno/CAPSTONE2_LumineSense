@@ -144,7 +144,7 @@ $conn->close();
 
             <div class="main-container faculty-timetable-heading d-flex flex-column align-items-center justify-content-center w-auto mb-3">
                 <h2 class="bold">Class Timetable for <?= $faculty_name ?></h2>
-                <p>Effective A.Y. <?= date('Y').'-'.(date('Y') + 1) ?> • Prepared by: Faculty Head <span class="bold" style="color: var(--secondary-color-2);">Charlie Ampatuan</span> • 
+                <p>Effective A.Y. <?= date('Y') . '-' . (date('Y') + 1) ?> • Prepared by: Faculty Head <span class="bold" style="color: var(--secondary-color-2);">Charlie Ampatuan</span> •
                     <span style="color: var(--secondary-color-2);">
                         Today is the
                         <span class="bold"><?= date('jS') ?></span> day of the month of
@@ -302,7 +302,8 @@ $conn->close();
                                                     <button class="btn-icon btn-icon-view"
                                                         title="View Details"
                                                         data-bs-toggle="tooltip"
-                                                        data-bs-placement="auto">
+                                                        data-bs-placement="auto"
+                                                        onclick="openSlotDetails(<?= $slot['id'] ?>, '<?= htmlspecialchars($slot['day_of_week']) ?>', '<?= $start ?>', '<?= $end ?>', '<?= htmlspecialchars($slot['room_name']) ?>', '<?= htmlspecialchars($ext ?? '') ?>')">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
                                                 <?php elseif ($ext_status === 'approved'): ?>
@@ -314,7 +315,8 @@ $conn->close();
                                                     <button class="btn-icon btn-icon-view"
                                                         title="View Details"
                                                         data-bs-toggle="tooltip"
-                                                        data-bs-placement="auto">
+                                                        data-bs-placement="auto"
+                                                        onclick="openSlotDetails(<?= $slot['id'] ?>, '<?= htmlspecialchars($slot['day_of_week']) ?>', '<?= $start ?>', '<?= $end ?>', '<?= htmlspecialchars($slot['room_name']) ?>', '<?= htmlspecialchars($ext ?? '') ?>')">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
                                                 <?php elseif ($ext_status === 'rejected'): ?>
@@ -333,7 +335,8 @@ $conn->close();
                                                     <button class="btn-icon btn-icon-view"
                                                         title="View Details"
                                                         data-bs-toggle="tooltip"
-                                                        data-bs-placement="auto">
+                                                        data-bs-placement="auto"
+                                                        onclick="openSlotDetails(<?= $slot['id'] ?>, '<?= htmlspecialchars($slot['day_of_week']) ?>', '<?= $start ?>', '<?= $end ?>', '<?= htmlspecialchars($slot['room_name']) ?>', '<?= htmlspecialchars($ext ?? '') ?>')">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
                                                 <?php else: ?>
@@ -347,7 +350,8 @@ $conn->close();
                                                     <button class="btn-icon btn-icon-view"
                                                         title="View Details"
                                                         data-bs-toggle="tooltip"
-                                                        data-bs-placement="auto">
+                                                        data-bs-placement="auto"
+                                                        onclick="openSlotDetails(<?= $slot['id'] ?>, '<?= htmlspecialchars($slot['day_of_week']) ?>', '<?= $start ?>', '<?= $end ?>', '<?= htmlspecialchars($slot['room_name']) ?>', '<?= htmlspecialchars($ext ?? '') ?>')">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
                                                 <?php endif; ?>
@@ -721,76 +725,77 @@ $conn->close();
             window._tickTimer();
             setInterval(window._tickTimer, 1000);
         })();
+
+        // ── View Slot Details Modal ───────────────────────────────
+        let viewSlotModal = null;
+
+        function openSlotDetails(id, day, startTime, endTime, room, extension) {
+            if (!viewSlotModal) {
+                viewSlotModal = new bootstrap.Modal(document.getElementById('viewSlotModal'));
+            }
+
+            document.getElementById('slot-day').textContent = day;
+            document.getElementById('slot-time').textContent = `${startTime} — ${endTime}`;
+            document.getElementById('slot-room').textContent = room;
+
+            const extRow = document.getElementById('slot-extension-row');
+            const extText = document.getElementById('slot-extension');
+
+            if (extension) {
+                extText.textContent = extension;
+                extRow.style.display = 'flex';
+            } else {
+                extRow.style.display = 'none';
+            }
+
+            viewSlotModal.show();
+        }
     </script>
 
-    <!-- View Schedule Modal -->
-    <div class="modal fade" id="viewScheduleModal" tabindex="-1" aria-labelledby="viewScheduleLabel" aria-hidden="true">
+    <!-- View Slot Details Modal -->
+    <div class="profile-details-modal modal fade" id="viewSlotModal" tabindex="-1" aria-labelledby="viewSlotLabel" aria-hidden="true">
         <div class="d-flex justify-content-center modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title bold" id="viewScheduleLabel">
-                        <i class="bi bi-calendar-week me-2"></i>Class Schedule
+                    <h5 class="modal-title bold" id="viewSlotLabel">
+                        <i class="bi bi-calendar-event me-2"></i>Schedule Details
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex flex-column gap-3">
-                        <?php if (!empty($schedules)): ?>
-                            <?php
-                            $dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                            usort($schedules, function ($a, $b) use ($dayOrder) {
-                                $da = array_search($a['day_of_week'], $dayOrder);
-                                $db = array_search($b['day_of_week'], $dayOrder);
-                                return $da !== $db ? $da - $db : strcmp($a['start_time'], $b['start_time']);
-                            });
-                            $dayIcons = [
-                                'Monday'    => 'bi-1-square-fill',
-                                'Tuesday'   => 'bi-2-square-fill',
-                                'Wednesday' => 'bi-3-square-fill',
-                                'Thursday'  => 'bi-4-square-fill',
-                                'Friday'    => 'bi-5-square-fill',
-                                'Saturday'  => 'bi-6-square-fill',
-                                'Sunday'    => 'bi-7-square-fill',
-                            ];
-                            $today = date('l');
-                            foreach ($schedules as $sched):
-                                $isToday  = ($sched['day_of_week'] === $today);
-                                $icon     = $dayIcons[$sched['day_of_week']] ?? 'bi-calendar';
-                                $start    = date('g:i A', strtotime($sched['start_time']));
-                                $end      = date('g:i A', strtotime($sched['end_time']));
-                            ?>
-                                <div class="d-flex align-items-center gap-3 p-2 rounded-3
-                                <?= $isToday ? 'bg-primary bg-opacity-10 border border-primary border-opacity-25' : 'bg-light' ?>">
-                                    <i class="bi <?= $icon ?> <?= $isToday ? 'text-primary' : 'text-secondary' ?>"
-                                        style="font-size:1.6rem; flex-shrink:0;"></i>
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <strong><?= htmlspecialchars($sched['day_of_week']) ?></strong>
-                                            <?php if ($isToday): ?>
-                                                <span class="badge bg-primary rounded-pill" style="font-size:0.7rem;">Today</span>
-                                            <?php endif; ?>
-                                        </div>
-                                        <small class="text-muted">
-                                            <i class="bi bi-clock me-1"></i><?= $start ?> — <?= $end ?>
-                                        </small>
-                                        <?php if (!empty($sched['room_name'])): ?>
-                                            <div style="font-size:0.8rem;" class="text-secondary">
-                                                <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($sched['room_name']) ?>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="d-flex align-items-center gap-3 p-2 bg-light rounded-3 text-muted">
-                                <i class="bi bi-calendar-x" style="font-size:1.6rem;"></i>
-                                <div>No schedules found.</div>
+                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
+                            <i class="bi bi-calendar-week text-primary" style="font-size:1.6rem; flex-shrink:0;"></i>
+                            <div class="flex-grow-1">
+                                <strong>Day</strong>
+                                <div id="slot-day" class="text-muted"></div>
                             </div>
-                        <?php endif; ?>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
+                            <i class="bi bi-clock text-primary" style="font-size:1.6rem; flex-shrink:0;"></i>
+                            <div class="flex-grow-1">
+                                <strong>Time</strong>
+                                <div id="slot-time" class="text-muted"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
+                            <i class="bi bi-door-open text-primary" style="font-size:1.6rem; flex-shrink:0;"></i>
+                            <div class="flex-grow-1">
+                                <strong>Room</strong>
+                                <div id="slot-room" class="text-muted"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3" id="slot-extension-row">
+                            <i class="bi bi-hourglass-split text-primary" style="font-size:1.6rem; flex-shrink:0;"></i>
+                            <div class="flex-grow-1">
+                                <strong>Extended Until</strong>
+                                <div id="slot-extension" class="text-muted"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="light" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

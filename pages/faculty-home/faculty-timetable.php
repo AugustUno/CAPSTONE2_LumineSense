@@ -263,7 +263,12 @@ $conn->close();
                     </div>
                     <div class="modal-body">
                         <p class="extend-description">
-                            <span class="emphasis">Request extension for <span id="extend-room"></span> at 10:30 AM/PM</span>
+                            <span class="emphasis">
+                                Requesting extension for
+                                <span id="extend-room"></span>
+                                from <span id="extend-start-time"></span>
+                                to <span id="extend-end-time"></span>
+                            </span>
                             <br>How many extra minutes do you need?
                         </p>
                         <div class="extend-modal-content d-flex gap-4">
@@ -301,9 +306,9 @@ $conn->close();
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="submitExtendBtn" disabled>
+                    <div class="modal-footer d-flex flex-row flex-nowrap justify-content-between gap-2">
+                        <button type="button" class="light bold w-100" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="medium w-100" id="submitExtendBtn" disabled>
                             Send Request
                         </button>
                     </div>
@@ -387,15 +392,22 @@ $conn->close();
         // Update the description text with extended time
         function updateDescription() {
             const totalSeconds = getTotalSecondsFromInputs();
-            const extraMinutes = Math.floor(totalSeconds / 60);
+            const elapsedMinutes = calculateElapsedMinutes(currentStartTime, currentEndTime);
+            const extraMinutes = Math.max(0, Math.floor(totalSeconds / 60) - elapsedMinutes);
+
+            document.getElementById('extend-room').textContent = currentRoom;
+            document.getElementById('extend-start-time').textContent = currentStartTime;
 
             if (currentEndTime) {
                 const endDateTime = parseTime(currentEndTime);
                 endDateTime.setMinutes(endDateTime.getMinutes() + extraMinutes);
                 const newEndTime = formatTime(endDateTime);
+                document.getElementById('extend-end-time').textContent = newEndTime;
                 document.getElementById('extend-time-range').textContent = `${currentStartTime} - ${newEndTime}`;
             }
-            document.getElementById('extend-room').textContent = currentRoom;
+
+            // Disable send button if timer is 00:00:00
+            document.getElementById('submitExtendBtn').disabled = totalSeconds === 0;
         }
 
         // Reset timer to elapsed time based on slot
@@ -436,65 +448,100 @@ $conn->close();
         document.querySelectorAll('.extend-pill').forEach(btn => {
             btn.addEventListener('click', () => {
                 const minsToAdd = parseInt(btn.dataset.mins);
-                totalExtensionMinutes += minsToAdd;
 
-                // Update visual state of buttons
+                // Read current values directly from the inputs
+                let currentHours = parseInt(document.getElementById('timer-hours').value) || 0;
+                let currentMinutes = parseInt(document.getElementById('timer-minutes').value) || 0;
+                let currentSeconds = parseInt(document.getElementById('timer-seconds').value) || 0;
+
+                // Add to minutes
+                currentMinutes += minsToAdd;
+
+                // Cascade overflow upward
+                if (currentMinutes >= 60) {
+                    currentHours += Math.floor(currentMinutes / 60);
+                    currentMinutes = currentMinutes % 60;
+                }
+                if (currentHours > 99) currentHours = 99;
+
+                // Write back
+                document.getElementById('timer-hours').value = currentHours.toString().padStart(2, '0');
+                document.getElementById('timer-minutes').value = currentMinutes.toString().padStart(2, '0');
+                document.getElementById('timer-seconds').value = currentSeconds.toString().padStart(2, '0');
+
+                // Visual state
                 document.querySelectorAll('.extend-pill').forEach(b => {
                     b.classList.remove('active', 'btn-primary');
                     b.classList.add('btn-outline-primary');
                 });
+                // Visual state - flash active then revert (push button behavior)
                 btn.classList.add('active', 'btn-primary');
                 btn.classList.remove('btn-outline-primary');
 
-                // Update timer display
-                const baseElapsedSeconds = calculateElapsedMinutes(currentStartTime, currentEndTime) * 60;
-                const newTotalSeconds = baseElapsedSeconds + (totalExtensionMinutes * 60);
-                updateTimerDisplay(newTotalSeconds);
+                setTimeout(() => {
+                    btn.classList.remove('active', 'btn-primary');
+                    btn.classList.add('btn-outline-primary');
+                }, 150);
 
-                // Update description
                 updateDescription();
-
                 document.getElementById('submitExtendBtn').disabled = false;
             });
         });
 
-        // Handle timer input changes - validate numbers only
+        // Handle timer input changes
         document.querySelectorAll('.timer-input').forEach(input => {
-            input.addEventListener('input', (e) => {
-                // Remove non-numeric characters
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            input.addEventListener('focus', (e) => {
+                e.target.select();
+            });
 
-                // Limit to 2 digits
-                if (e.target.value.length > 2) {
-                    e.target.value = e.target.value.slice(0, 2);
-                }
+            input.addEventListener('blur', (e) => {
+                let val = parseInt(e.target.value) || 0;
 
-                // Ensure at least 2 digits with leading zero
-                if (e.target.value.length === 1) {
-                    e.target.value = '0' + e.target.value;
-                }
-
-                // Validate ranges
                 if (e.target.id === 'timer-hours') {
-                    let val = parseInt(e.target.value) || 0;
                     if (val > 99) val = 99;
                     e.target.value = val.toString().padStart(2, '0');
                 } else if (e.target.id === 'timer-minutes') {
-                    let val = parseInt(e.target.value) || 0;
-                    if (val > 59) val = 59;
+                    if (val >= 60) {
+                        const carryHours = Math.floor(val / 60);
+                        const remMinutes = val % 60;
+                        const hoursInput = document.getElementById('timer-hours');
+                        let currentHours = parseInt(hoursInput.value) || 0;
+                        currentHours = Math.min(99, currentHours + carryHours);
+                        hoursInput.value = currentHours.toString().padStart(2, '0');
+                        val = remMinutes;
+                    }
                     e.target.value = val.toString().padStart(2, '0');
                 } else if (e.target.id === 'timer-seconds') {
-                    let val = parseInt(e.target.value) || 0;
-                    if (val > 59) val = 59;
+                    if (val >= 60) {
+                        const carryMinutes = Math.floor(val / 60);
+                        const remSeconds = val % 60;
+                        const minutesInput = document.getElementById('timer-minutes');
+                        let currentMinutes = parseInt(minutesInput.value) || 0;
+                        currentMinutes += carryMinutes;
+                        // Seconds carry may itself push minutes over 60, cascade up
+                        if (currentMinutes >= 60) {
+                            const carryHours = Math.floor(currentMinutes / 60);
+                            currentMinutes = currentMinutes % 60;
+                            const hoursInput = document.getElementById('timer-hours');
+                            let currentHours = parseInt(hoursInput.value) || 0;
+                            currentHours = Math.min(99, currentHours + carryHours);
+                            hoursInput.value = currentHours.toString().padStart(2, '0');
+                        }
+                        minutesInput.value = currentMinutes.toString().padStart(2, '0');
+                        val = remSeconds;
+                    }
                     e.target.value = val.toString().padStart(2, '0');
                 }
 
                 updateDescription();
             });
 
-            // Handle focus - select all text
-            input.addEventListener('focus', (e) => {
-                e.target.select();
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') e.target.blur();
             });
         });
 

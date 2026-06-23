@@ -108,16 +108,15 @@ $conn->close();
 <body class="contrast-bg">
     <?php include '../../php/includes/admin-topbar.php'; ?>
 
-    <div class="px-4 pt-3">
-        <button class="light w-auto"
-            onclick="dissolve('admin-room-manage.php')"
-            style="padding:6px 20px; margin-bottom:10px;">
-            <i class="bi bi-arrow-left me-1"></i> Back to Room Management
-        </button>
-    </div>
 
     <!-- ═══ PAGE CONTENT ═══ -->
-    <div class="page-content">
+    <div class="profile-wrapper page-content flex-column">
+        <div class="px-4 pt-3">
+            <button class="light mb-3"
+                onclick="dissolve('admin-room-manage.php')" >
+                <i class="bi bi-arrow-left me-1"></i> Back to Room Management
+            </button>
+        </div>
 
         <div class="schedule-card">
 

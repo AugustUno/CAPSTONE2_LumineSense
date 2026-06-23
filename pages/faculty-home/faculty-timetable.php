@@ -131,6 +131,7 @@ $conn->close();
     <link rel="stylesheet" href="../../css/modals.css">
     <link rel="stylesheet" href="../../css/faculty-timetable.css">
     <link rel="stylesheet" href="../../css/faculty-common.css">
+    <link rel="stylesheet" href="../../css/faculty-settings.css">
 
     <title>Class Schedule – LumineSense</title>
 </head>
@@ -142,18 +143,6 @@ $conn->close();
 
         <div class="child-container mb-3">
 
-            <div class="main-container faculty-timetable-heading d-flex flex-column align-items-center justify-content-center w-auto mb-3">
-                <h2 class="bold">Class Timetable for <?= $faculty_name ?></h2>
-                <p>Effective A.Y. <?= date('Y') . '-' . (date('Y') + 1) ?> • Prepared by: Faculty Head <span class="bold" style="color: var(--secondary-color-2);">Charlie Ampatuan</span> •
-                    <span style="color: var(--secondary-color-2);">
-                        Today is the
-                        <span class="bold"><?= date('jS') ?></span> day of the month of
-                        <span class="bold"><?= date('F') ?></span>, S.Y.
-                        <span class="bold"><?= date('Y') ?></span>
-                    </span>
-                </p>
-                <!--Note: Faculty Head is static-->
-            </div>
 
             <div class="main-container faculty-timetable w-auto">
                 <!-- Time Left -->
@@ -235,9 +224,26 @@ $conn->close();
 
         </div>
 
-        <div class="child-container">
-            <div class="main-container homepage gap-3" style="flex-direction:column;">
 
+
+        <div class="child-container">
+            <!-- intro heading -->
+            <div class="main-container faculty-timetable-heading d-flex flex-column align-items-center justify-content-center w-auto mb-3">
+                <h2 class="bold">Class Timetable for <?= $faculty_name ?></h2>
+                <p>Effective A.Y. <?= date('Y') . '-' . (date('Y') + 1) ?> • Prepared by:
+                    <span class="bold status-badge faculty-head">Faculty Head</span>
+                    <span class="bold" style="color: var(--secondary-color-2);">Charlie Ampatuan</span> •
+                    <span style="color: var(--secondary-color-2);">
+                        Today is the
+                        <span class="bold"><?= date('jS') ?></span> day of the month of
+                        <span class="bold"><?= date('F') ?></span>, S.Y.
+                        <span class="bold"><?= date('Y') ?></span>
+                    </span>
+                </p>
+                <!--Note: Faculty Head is static-->
+            </div>
+
+            <div class="main-container homepage gap-3" style="flex-direction:column;">
                 <!-- Flash messages -->
                 <?php if (!empty($_SESSION['timetable_success'])): ?>
                     <div class="alert alert-success">
@@ -738,16 +744,6 @@ $conn->close();
             document.getElementById('slot-time').textContent = `${startTime} — ${endTime}`;
             document.getElementById('slot-room').textContent = room;
 
-            const extRow = document.getElementById('slot-extension-row');
-            const extText = document.getElementById('slot-extension');
-
-            if (extension) {
-                extText.textContent = extension;
-                extRow.style.display = 'flex';
-            } else {
-                extRow.style.display = 'none';
-            }
-
             viewSlotModal.show();
         }
     </script>
@@ -789,7 +785,7 @@ $conn->close();
                             <i class="bi bi-hourglass-split text-primary" style="font-size:1.6rem; flex-shrink:0;"></i>
                             <div class="flex-grow-1">
                                 <strong>Subject</strong>
-                                <div id="slot-extension" class="text-muted"></div>
+                                <div id="slot-extension" class="text-muted">Math</div><!---- Placeholder subject, replace with actual subject if available -->
                             </div>
                         </div>
                     </div>

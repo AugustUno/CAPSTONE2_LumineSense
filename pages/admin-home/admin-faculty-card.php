@@ -43,7 +43,7 @@ $stmt = $conn->prepare("
     FROM schedules s JOIN classrooms c ON c.id = s.classroom_id
     WHERE s.created_by = ?
     ORDER BY FIELD(s.day_of_week,
-        'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'),
+        'Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'),
         s.start_time
 ");
 $stmt->bind_param('i', $faculty_id);
@@ -107,6 +107,7 @@ $conn->close();
     <link rel="stylesheet" href="../../css/admin-common.css">
     <link rel="stylesheet" href="../../css/faculty-settings.css">
     <link rel="stylesheet" href="../../css/admin-profile-settings.css">
+    <link rel="stylesheet" href="../../css/faculty-timetable.css">
 
     <title>Faculty Profile - LumineSense</title>
 </head>
@@ -196,21 +197,63 @@ $conn->close();
             <!-- Schedule -->
             <div class="section-container faculty-info-card p-3 mb-3">
                 <h3 class="bold mb-3">Schedule</h3>
-                <?php if (empty($f_schedules)): ?>
-                    <p class="text-muted">No schedules yet.</p>
-                    <?php else: foreach ($f_schedules as $s): ?>
-                        <div class="d-flex align-items-center justify-content-between py-2 schedule-row">
-                            <div>
-                                <p class="bold mb-0 schedule-time">
-                                    <?= date('g:i A', strtotime($s['start_time'])) ?> –
-                                    <?= date('g:i A', strtotime($s['end_time'])) ?>
-                                </p>
-                                <small class="text-muted"><?= $s['day_of_week'] ?></small>
+                <!-- Weekly schedule -->
+                <div class="weekly-schedule-grid">
+                    <?php
+                    // Group schedules by day of week
+                    $days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                    $schedule_by_day = [];
+                    foreach ($days as $day) {
+                        $schedule_by_day[$day] = array_filter($f_schedules, fn($s) => $s['day_of_week'] === $day);
+                    }
+                    ?>
+                    <?php foreach ($days as $day): ?>
+                        <div class="day-card">
+                            <div class="day-label">
+                                <?= $day ?>
                             </div>
-                            <span class="badge schedule-badge"><?= htmlspecialchars($s['room_name']) ?></span>
+
+                            <?php if (empty($schedule_by_day[$day])): ?>
+                                <p class="no-sched">No classes scheduled.</p>
+                                <?php else: foreach ($schedule_by_day[$day] as $s):
+                                    $start    = date('g:i A', strtotime($s['start_time']));
+                                    $end      = date('g:i A', strtotime($s['end_time']));
+                                ?>
+                                    <div class="slot-row">
+                                        <div class="slot-header">
+                                            <div class="slot-time-left">
+                                                <?php
+                                                // Start time
+                                                $start_parts = explode(' ', $start);
+                                                $start_time_part = $start_parts[0];
+                                                $start_ampm = isset($start_parts[1]) ? $start_parts[1] : 'AM';
+
+                                                // End time
+                                                $end_parts = explode(' ', $end);
+                                                $end_time_part = $end_parts[0];
+                                                $end_ampm = isset($end_parts[1]) ? $end_parts[1] : 'AM';
+                                                ?>
+                                                <span class="slot-time-start"><?= $start_time_part ?></span>
+                                                <span class="slot-time-separator">TO</span><br>
+                                                <span class="slot-time-end"><?= $end_time_part ?></span>
+                                                <span class="slot-time-ampm"><?= $end_ampm ?></span>
+                                            </div>
+                                        </div>
+                                        <div class="slot-content">
+                                            <div class="slot-room">
+                                                <i class="bi bi-door-open me-1"></i><?= htmlspecialchars($s['room_name']) ?>
+                                            </div>
+                                             <div class="slot-subject d-flex flex-row">
+                                                <i class="bi bi-book me-1"></i>
+                                                <h5>Math</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                            <?php endforeach;
+                            endif; ?>
                         </div>
-                <?php endforeach;
-                endif; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <!-- Edit Faculty Modal -->
             <!-- <div class="profile-details-modal modal fade" id="editFacultyModal" tabindex="-1"

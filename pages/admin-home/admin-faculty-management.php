@@ -144,6 +144,11 @@ $conn->close();
                                         <span class="label">Number of faculty:</span>
                                         <span class="value bold">5</span>
                                     </div>
+                                    <div class="info-row">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <span class="label">Description:</span>
+                                        <span class="value">Computer Science Department</span>
+                                    </div>
                                 </div>
                             </div>
 

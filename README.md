@@ -1,9 +1,11 @@
+# Table Tracking
+
 | Date | Modules Affected | Notes |
 | :--- | :---: | :--- |
 | June 17 | Directory Restructuring & Path Refactoring | <ul><li>Moved files from root to subdirectories (`css/`, `script/`, `pages/`, `python/`, `misc/`)</li><li>Refactored stand-alone `api/` scripts into OOP controllers under `app/controllers/`</li><li>Fixed all broken asset paths, fetch URLs, and spawned script paths across JS, Python, and ESP32 firmware</li></ul> |
 | June 23 | Faculty Timetable | <ul><li>BACKEND NEEDS: Subject name per schedule as assigned by Faculty Head (FH)</li></ul> | 
 
-Backend Needs:
+## Backend Needs:
 
 - Tab navigation in admin-reports.php
 - Updating stat cards in admin-faculty-management.php
@@ -11,22 +13,24 @@ Backend Needs:
 - Assigned room and subject non-static and fully implemented in faculty-timetable.php
 - Current classes and next classes reflected in faculty-timetable.php
 
-Backend Recommendations:
+## Backend Recommendations:
 
-- Do not accept Duplicate E-mail Registrations from Faculty Members to avoid redundancy
-- Form validation in certain modals (Require some fields to be inputted before submitting/confirming/adding)   \
+- Form validation in certain modals (Require some fields to be inputted before submitting/confirming/adding)
 - Faculty Timetable approved/disapproved status (specifically $ext_status variable) is staticcc if implemented pending lang guro ang mabilin (the logic is maging Pending ang button kung mag request si faculty member)
+- Review the ai_confidence_note because some fields says "AI could not read..." -> change to -> "API could not read""
 
-Personal Issues:
-
-- PHPMailer seems to have errors on me when developing -G
-
-Future Refinements:
+## Future Refinements:
 
 - Improve landing page
 - Organize/transport files for scripting and make OOP flexible for php (all those necessary)
 
-Outdated:
+## Personal Issues:
+
+- PHPMailer seems to have errors on me when developing -G **__resolved June 24 -G__**
+
+
+
+## Outdated:
 
 | Date | Modules Affected | Notes |
 | :--- | :---: | :--- |

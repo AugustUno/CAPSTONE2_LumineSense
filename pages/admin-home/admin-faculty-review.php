@@ -112,11 +112,13 @@ $conn->close();
         <div class="child-container px-4 py-4">
 
             <!-- Back button -->
-            <div class="mb-3">
-                <button onclick="dissolve('admin-faculty-management.php')"
-                   class="light w-auto">
-                    <i class="bi bi-arrow-left me-1"></i> Back to Faculty Management
-                </button>
+            <div class="container d-flex align-items-center justify-content-center">
+                <div class="mb-3">
+                    <button onclick="dissolve('admin-faculty-management.php')"
+                       class="light w-auto">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Faculty Management
+                    </button>
+                </div>
             </div>
 
             <?php if ($message === 'approved'): ?>
@@ -138,11 +140,11 @@ $conn->close();
                     </div>
                     <div>
                         <?php if ($faculty['approved_by']): ?>
-                            <span class="status-badge status-badge-approved">
+                            <span class="status-badge status-badge-approved bold">
                                 <i class="bi bi-check-circle me-1"></i> Approved
                             </span>
                         <?php else: ?>
-                            <span class="status-badge status-badge-pending">
+                            <span class="status-badge status-badge-pending bold">
                                 <i class="bi bi-hourglass-split me-1"></i> Pending
                             </span>
                         <?php endif; ?>
@@ -200,7 +202,7 @@ $conn->close();
                             </div>
 
                             <!-- AI Result -->
-                            <h6 class="fw-bold mb-2">AI Verification Result</h6>
+                            <h6 class="fw-bold mb-2">API Verification Result</h6>
                             <div class="mb-3">
                                 <?php
                                 $status = $faculty['ai_match_status'] ?? 'unreadable';
@@ -226,7 +228,7 @@ $conn->close();
 
                                 <?php if (!empty($faculty['ai_extracted_name'])): ?>
                                     <div class="info-row mt-2">
-                                        <span class="info-label">Name on ID (AI Read)</span>
+                                        <span class="info-label">Name on ID (API Read)</span>
                                         <span class="info-value">
                                             <?= htmlspecialchars($faculty['ai_extracted_name']) ?>
                                         </span>

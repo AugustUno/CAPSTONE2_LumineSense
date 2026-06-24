@@ -123,6 +123,20 @@ $conn->close();
                                                 data-bs-placement="auto">
                                                 <i class="bi bi-eye"></i>
                                             </button>
+                                            <button class="btn-icon btn-icon-edit" 
+                                                title="Edit Department" 
+                                                onclick="openEditModal()"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="auto">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn-icon btn-icon-del"
+                                                title="Delete Department"
+                                                onclick="openDeleteModal()"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="auto">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                             <!-- <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
                                                 onclick="window.location.href='admin-department-card.php?id=1'"
                                                 title="Edit Department"
@@ -143,11 +157,6 @@ $conn->close();
                                         <span class="department-info-label">Number of faculty:</span>
                                         <span class="department-info-val bold">5</span>
                                     </div>
-                                </div>
-
-                                <div class="department-card-actions">
-                                    <button class="medium" onclick="window.location.href='admin-department-card.php?id=1'">View</button>
-                                    <button class="light" onclick="window.location.href='admin-department-card.php?id=1'">Manage</button>
                                 </div>
                             </div>
                             <!-- 

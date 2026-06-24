@@ -1,4 +1,7 @@
 <?php
+
+// Check if the logged-in faculty member is a Department Head
+$is_head = $_SESSION['is_head'] ?? false;
 ?>
 
 <!-- SIDEBAR LEFT -->
@@ -25,6 +28,14 @@
             </button>
             <h3 class="bold mb-0 sidebar-label">Timetable</h3>
         </div>
+        <?php if ($is_head): ?>
+        <div class="d-flex flex-row justify-content-center align-items-center gap-2 sidebar-item">
+            <button class="nav-btn" title="Head Timetable" onclick="dissolve('faculty-head-timetable.php')">
+                <i class="bi bi-calendar3-range-fill"></i>
+            </button>
+            <h3 class="bold mb-0 sidebar-label">Manage Schedules</h3>
+        </div>
+        <?php endif; ?>
         <div class="d-flex flex-row justify-content-center align-items-center gap-2 sidebar-item">
             <button class="nav-btn" title="Profile Settings" onclick="dissolve('faculty-profile-settings.php')">
                 <i class="bi bi-gear"></i>
@@ -39,21 +50,27 @@
 
 <script>
     (function() {
+        // 1. Get the current page filename
         const page = window.location.pathname.split('/').pop();
-        const map = {
-            'faculty-home.php': 0,
-            // 'faculty-readings.php': 1,
-            'faculty-timetable.php': 1,
-            'faculty-profile-settings.php': 2,
-        };
-        const index = map[page];
-        if (index !== null && index !== undefined) {
-            const btns = document.querySelectorAll('#sidebarOffcanvas .nav-btn');
-            if (btns[index]) {
-                btns[index].style.backgroundColor = 'var(--secondary-color-4)';
-                btns[index].style.boxShadow = '0 0 0 3px rgba(155,0,233,0.3)';
+        if (!page) return;
+
+        // 2. Find all sidebar items and loop through them
+        const sidebarItems = document.querySelectorAll('#sidebarOffcanvas .sidebar-item');
+        
+        sidebarItems.forEach(item => {
+            const btn = item.querySelector('.nav-btn');
+            if (!btn) return;
+
+            // 3. Extract the target page from the onclick attribute (e.g., dissolve('faculty-home.php'))
+            const onclickText = btn.getAttribute('onclick') || '';
+            
+            // Check if the current filename is referenced inside the button's click event
+            if (onclickText.includes(page)) {
+                // Apply the active styling seamlessly regardless of button order!
+                btn.style.backgroundColor = 'var(--secondary-color-4)';
+                btn.style.boxShadow = '0 0 0 3px rgba(155,0,233,0.3)';
             }
-        }
+        });
     })();
 </script>
 

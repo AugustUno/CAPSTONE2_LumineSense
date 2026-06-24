@@ -230,7 +230,7 @@ $conn->close();
             <!-- intro heading -->
             <div class="main-container faculty-timetable-heading d-flex flex-column align-items-center justify-content-center w-auto mb-3">
                 <h2 class="bold">Class Timetable for <?= $faculty_name ?></h2>
-                <p>Effective A.Y. <?= date('Y') . '-' . (date('Y') + 1) ?> • Prepared by:
+                <p class="text-center">Effective A.Y. <?= date('Y') . '-' . (date('Y') + 1) ?> • Prepared by:
                     <span class="bold status-badge faculty-head">Faculty Head</span>
                     <span class="bold" style="color: var(--secondary-color-2);">Charlie Ampatuan</span> •
                     <span style="color: var(--secondary-color-2);">
@@ -238,7 +238,8 @@ $conn->close();
                         <span class="bold"><?= date('jS') ?></span> day of the month of
                         <span class="bold"><?= date('F') ?></span>, S.Y.
                         <span class="bold"><?= date('Y') ?></span>
-                    </span>
+                    </span><br>
+                    You as the <span class="bold status-badge faculty-member">Faculty Member</span> can view all schedules of the set to you by the <span class="bold status-badge faculty-head">Faculty Head</span>, as well as request for an extension of your class schedule and end schedule prematurely if needed.
                 </p>
                 <!--Note: Faculty Head is static-->
             </div>

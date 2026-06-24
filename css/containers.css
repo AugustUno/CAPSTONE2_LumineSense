@@ -224,10 +224,14 @@
 }
 
 .main-container.faculty-timetable {
-    background-color: var(--secondary-color-2);
+    background-color: #440074;
     display: flex;
     padding: 1rem;
     gap: 2rem;
+
+    div.section-container.head-timetable {
+        background-color: #f8f9fa;
+    }
 
     .group-container:first-child {
         flex: 2;
@@ -307,7 +311,8 @@
 
 .main-container {
     background-color: #ffffff;
-    border-radius: 15px; /*NOTE: Do not change for CONSISTENCY*/
+    border-radius: 15px;
+    /*NOTE: Do not change for CONSISTENCY*/
     box-shadow: 0 28px 80px rgba(0, 0, 0, 0.17);
     padding: 2rem;
     width: auto;
@@ -515,9 +520,14 @@
 }
 
 .section-container.timetable {
-    border-left: 5px solid var(--secondary-color-1);
+    border-left: 5px solid var(--secondary-color-4);
     box-shadow: 0 8px 32px rgba(47, 0, 79, 0.18);
     height: 30vh;
+}
+
+.section-container.head-timetable {
+    border-left: 5px solid var(--secondary-color-4);
+    box-shadow: 0 8px 32px rgba(47, 0, 79, 0.18);
 }
 
 .section-topbar {

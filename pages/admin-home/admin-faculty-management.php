@@ -106,83 +106,88 @@ $conn->close();
                         <div class="departments-scroll-container gap-2" style="max-height: 100vh; overflow-y: auto;">
 
                             <div class="department-card">
-                                <div class="department-header d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-start">
-                                        <h3 class="bold">Magical Transfiguration Department</h3>
+                                <div class="department-card-accent department-badge-active"></div>
+                                <div class="department-card-body">
+                                    <div class="department-card-header">
+                                        <div>
+                                            <div class="department-card-name d-flex align-items-center justify-content-between">
+                                                Magical Transfiguration Department <span class="department-status-badge department-badge-active bold mx-2">Active</span>
+                                            </div>
+                                            <div class="department-card-section">Computer Science Department</div>
+                                        </div>
+                                        <div class="d-flex align-items-center department-icons gap-1">
+                                            <button class="btn-icon btn-icon-view d-inline-flex align-items-center justify-content-center"
+                                                onclick="window.location.href='admin-department-card.php?id=1'"
+                                                title="View Department"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="auto">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <!-- <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
+                                                onclick="window.location.href='admin-department-card.php?id=1'"
+                                                title="Edit Department"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="auto">
+                                                <i class="bi bi-pencil"></i>
+                                            </button> -->
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-end">
-                                        <button class="btn-icon btn-icon-view d-inline-flex align-items-center justify-content-center"
-                                            onclick="window.location.href='admin-department-card.php?id=1'"
-                                            title="View Department"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="auto">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <!-- <button class="btn-icon btn-icon-edit d-inline-flex align-items-center justify-content-center"
-                                            onclick="window.location.href='admin-department-card.php?id=1'"
-                                            title="Edit Department"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="auto">
-                                            <i class="bi bi-pencil"></i>
-                                        </button> -->
+                                    <hr class="department-card-divider">
+                                    <div class="department-info-row">
+                                        <i class="bi bi-person-badge"></i>
+                                        <span class="department-info-label">Head:</span>
+                                        <span class="department-info-val bold">Minerva McGonagall</span>
+                                    </div>
+                                    <div class="department-info-row">
+                                        <i class="bi bi-people"></i>
+                                        <span class="department-info-label">Number of faculty:</span>
+                                        <span class="department-info-val bold">5</span>
                                     </div>
                                 </div>
 
-                                <span class="department-badge department-badge-active bold">Active</span>
-                                <span class="department-badge department-badge-pending bold">Pending</span>
-                                <span class="department-badge department-badge-inactive bold">Inactive</span>
-                                <!--Note: Status pills for when admin wants to disable/enable departments-->
-
-                                <div class="department-info mt-2">
-                                    <div class="info-row">
-                                        <i class="bi bi-person-badge me-2"></i>
-                                        <span class="label">Head:</span>
-                                        <span class="value bold">Minerva McGonagall</span>
-                                    </div>
-                                    <div class="info-row">
-                                        <i class="bi bi-people me-2"></i>
-                                        <span class="label">Number of faculty:</span>
-                                        <span class="value bold">5</span>
-                                    </div>
-                                    <div class="info-row">
-                                        <i class="bi bi-info-circle me-2"></i>
-                                        <span class="label">Description:</span>
-                                        <span class="value">Computer Science Department</span>
-                                    </div>
+                                <div class="department-card-actions">
+                                    <button class="medium" onclick="window.location.href='admin-department-card.php?id=1'">View</button>
+                                    <button class="light" onclick="window.location.href='admin-department-card.php?id=1'">Manage</button>
                                 </div>
                             </div>
-
+                            <!-- 
                             <div class="department-card">
-                                <div class="department-header d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-start">
-                                        <h3 class="bold">example if newly created</h3>
+                                <div class="department-card-accent department-badge-pending"></div>
+                                <div class="department-card-body">
+                                    <div class="department-card-header">
+                                        <div>
+                                            <div class="department-card-name">example if newly created</div>
+                                            <div class="department-card-section">—</div>
+                                        </div>
+                                        <div class="d-flex align-items-center department-icons gap-1">
+                                            <span class="department-status-badge department-badge-pending bold">Pending</span>
+                                            <button class="btn-icon btn-icon-view d-inline-flex align-items-center justify-content-center"
+                                                onclick="window.location.href='admin-department-card.php?id=1'"
+                                                title="View Department"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="auto">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-end">
-                                        <button class="btn-icon btn-icon-view d-inline-flex align-items-center justify-content-center"
-                                            onclick="window.location.href='admin-department-card.php?id=1'"
-                                            title="View Department"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="auto">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                                    <hr class="department-card-divider">
+                                    <div class="department-info-row">
+                                        <i class="bi bi-person-badge"></i>
+                                        <span class="department-info-label">Head:</span>
+                                        <span class="department-info-val bold">None assigned</span>
+                                    </div>
+                                    <div class="department-info-row">
+                                        <i class="bi bi-people"></i>
+                                        <span class="department-info-label">Number of faculty:</span>
+                                        <span class="department-info-val bold">None assigned</span>
                                     </div>
                                 </div>
 
-                                <span class="department-badge department-badge-pending bold">Pending</span>
-
-                                <div class="department-info mt-2">
-                                    <div class="info-row">
-                                        <i class="bi bi-person-badge me-2"></i>
-                                        <span class="label">Head:</span>
-                                        <span class="value bold">None assigned</span>
-                                    </div>
-                                    <div class="info-row">
-                                        <i class="bi bi-people me-2"></i>
-                                        <span class="label">Number of faculty:</span>
-                                        <span class="value bold">None assigned</span>
-                                    </div>
+                                <div class="department-card-actions">
+                                    <button class="medium" onclick="window.location.href='admin-department-card.php?id=1'">View</button>
+                                    <button class="light" onclick="window.location.href='admin-department-card.php?id=1'">Manage</button>
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
 

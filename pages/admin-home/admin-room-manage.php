@@ -219,10 +219,10 @@ while ($row = $r->fetch_assoc()) $classrooms[] = $row;
                                     onclick="openRoomModal(<?= $c['id'] ?>, '<?= addslashes($c['room_name']) ?>', '<?= $c['room_size'] ?>', '<?= addslashes($c['description']) ?>')">
                                     View
                                 </button>
-                                <button class="light"
+                                <!-- <button class="light"
                                     onclick="dissolve('admin-timetable-manage.php?room=<?= urlencode($c['room_name']) ?>')">
                                     Timetable
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                     <?php endforeach; ?>

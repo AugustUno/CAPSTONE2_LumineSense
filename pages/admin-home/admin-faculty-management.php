@@ -20,6 +20,15 @@ require_once $phpRoot . '/handlers/admin-handlers.php';
 /** @var array $departments */
 
 require_once '../../php/handlers/admin-handlers.php';
+
+// faculty_id => department_id for anyone who is already a department head
+$faculty_head_of_dept = [];
+foreach ($departments as $dept) {
+    if (!empty($dept['head_faculty_id'])) {
+        $faculty_head_of_dept[(int)$dept['head_faculty_id']] = (int)$dept['id'];
+    }
+}
+
 $conn->close();
 ?>
 
@@ -107,7 +116,7 @@ $conn->close();
                         <div class="departments-scroll-container gap-2" style="max-height: 100vh; overflow-y: auto;">
 
                             <?php if (!empty($departments)): foreach ($departments as $dept): ?>
-                            <div class="department-card">
+                            <div class="department-card m-3">
                                 <div class="department-card-accent <?= $dept['status'] === 'active' ? 'department-badge-active' : 'department-badge-pending' ?>"></div>
                                 <div class="department-card-body">
                                     <div class="department-card-header">
@@ -161,7 +170,8 @@ $conn->close();
                                                 } elseif (!empty($all_faculty_map[(int)$dept['head_faculty_id']])) {
                                                     // Fallback: full row stored in map has first_name / last_name
                                                     $h = $all_faculty_map[(int)$dept['head_faculty_id']];
-                                                    echo htmlspecialchars($h['first_name'] . ' ' . $h['last_name']);
+                                                    echo htmlspecialchars($h['name']);
+
                                                 } else {
                                                     echo 'None assigned';
                                                 }
@@ -525,7 +535,7 @@ $conn->close();
                             <input type="text" class="form-control mb-2" placeholder="Search faculty members..." oninput="filterFacultySearch(this, 'editHodList')">
                             <div id="editHodList" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
                                 <?php if (!empty($faculty_list)): foreach ($faculty_list as $f): if ($f['status_label'] === 'approved'): ?>
-                                <div class="form-check py-1 faculty-search-item" data-name="<?= strtolower(htmlspecialchars($f['first_name'] . ' ' . $f['last_name'])) ?>">
+                                <div class="form-check py-1 faculty-search-item" data-name="<?= strtolower(htmlspecialchars($f['first_name'] . ' ' . $f['last_name'])) ?>" data-head-of-dept="<?= (int)($faculty_head_of_dept[(int)$f['id']] ?? 0) ?>">
                                     <input class="form-check-input edit-hod-radio" type="radio" name="head_faculty_id" id="editHod_<?= $f['id'] ?>" value="<?= $f['id'] ?>" data-faculty-id="<?= $f['id'] ?>">
                                     <label class="form-check-label" for="editHod_<?= $f['id'] ?>">
                                         <?= htmlspecialchars($f['first_name'] . ' ' . $f['last_name']) ?>
@@ -544,7 +554,7 @@ $conn->close();
                             <input type="text" class="form-control mb-2" placeholder="Search faculty members..." oninput="filterFacultySearch(this, 'editMembersList')">
                             <div id="editMembersList" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
                                 <?php if (!empty($faculty_list)): foreach ($faculty_list as $f): if ($f['status_label'] === 'approved'): ?>
-                                <div class="form-check py-1 faculty-search-item" data-name="<?= strtolower(htmlspecialchars($f['first_name'] . ' ' . $f['last_name'])) ?>">
+                                <div class="form-check py-1 faculty-search-item" data-name="<?= strtolower(htmlspecialchars($f['first_name'] . ' ' . $f['last_name'])) ?>" data-head-of-dept="<?= (int)($faculty_head_of_dept[(int)$f['id']] ?? 0) ?>">
                                     <input class="form-check-input edit-member-checkbox" type="checkbox" name="faculty_members[]" id="editMember_<?= $f['id'] ?>" value="<?= $f['id'] ?>" data-faculty-id="<?= $f['id'] ?>">
                                     <label class="form-check-label" for="editMember_<?= $f['id'] ?>">
                                         <?= htmlspecialchars($f['first_name'] . ' ' . $f['last_name']) ?>
@@ -669,10 +679,26 @@ $conn->close();
             const query = inputEl.value.toLowerCase().trim();
             const list = document.getElementById(listId);
             if (!list) return;
+            const editingDeptId = (listId === 'editHodList' || listId === 'editMembersList')
+                ? parseInt(document.getElementById('editDeptId')?.value || '0', 10)
+                : 0;
+
             list.querySelectorAll('.faculty-search-item').forEach(item => {
                 const label = item.querySelector('label');
                 const name = label ? label.textContent.toLowerCase() : '';
-                item.style.display = (!query || name.includes(query)) ? '' : 'none';
+                const matchesQuery = !query || name.includes(query);
+
+                let allowed = true;
+                if (editingDeptId > 0) {
+                    const headOfDept = parseInt(item.dataset.headOfDept || '0', 10);
+                    if (listId === 'editHodList') {
+                        allowed = headOfDept === 0 || headOfDept === editingDeptId;
+                    } else if (listId === 'editMembersList') {
+                        allowed = headOfDept === 0;
+                    }
+                }
+
+                item.style.display = (matchesQuery && allowed) ? '' : 'none';
             });
         }
 
@@ -701,6 +727,28 @@ $conn->close();
         }
 
         // ── EDIT DEPARTMENT MODAL ──
+        function applyEditDepartmentFacultyVisibility(deptId) {
+            document.querySelectorAll('#editHodList .faculty-search-item').forEach(item => {
+                const headOfDept = parseInt(item.dataset.headOfDept || '0', 10);
+                const visible = headOfDept === 0 || headOfDept === deptId;
+                item.style.display = visible ? '' : 'none';
+                if (!visible) {
+                    const input = item.querySelector('.edit-hod-radio');
+                    if (input) input.checked = false;
+                }
+            });
+
+            document.querySelectorAll('#editMembersList .faculty-search-item').forEach(item => {
+                const headOfDept = parseInt(item.dataset.headOfDept || '0', 10);
+                const visible = headOfDept === 0;
+                item.style.display = visible ? '' : 'none';
+                if (!visible) {
+                    const input = item.querySelector('.edit-member-checkbox');
+                    if (input) input.checked = false;
+                }
+            });
+        }
+
         function openEditDepartmentModal(id, name, description, headFacultyId) {
             // Populate fields
             document.getElementById('editDeptId').value = id;
@@ -711,8 +759,8 @@ $conn->close();
             document.querySelectorAll('.edit-hod-radio').forEach(r => r.checked = false);
             document.querySelectorAll('.edit-member-checkbox').forEach(c => c.checked = false);
             document.getElementById('editDepartmentModal').querySelectorAll('input[type=text]:not(#editDeptName):not(#editDeptDescription)').forEach(el => el.value = '');
-            // Show all items
-            document.querySelectorAll('#editHodList .faculty-search-item, #editMembersList .faculty-search-item').forEach(el => el.style.display = '');
+
+            applyEditDepartmentFacultyVisibility(id);
 
             // Pre-select Head of Department
             if (headFacultyId) {
@@ -724,7 +772,7 @@ $conn->close();
             const members = deptMembers[id] || [];
             members.forEach(fid => {
                 const cb = document.getElementById('editMember_' + fid);
-                if (cb) cb.checked = true;
+                if (cb && cb.closest('.faculty-search-item').style.display !== 'none') cb.checked = true;
             });
 
             new bootstrap.Modal(document.getElementById('editDepartmentModal')).show();

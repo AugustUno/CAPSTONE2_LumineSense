@@ -34,16 +34,12 @@ $stmt->close();
 
 if (!$row || !password_verify($password, $row['password'])) {
     $_SESSION['faculty_attempts']++;
+    $_SESSION['faculty_attempt_time'] = time();
     $_SESSION['login_error'] = 'Invalid email or password.';
     header('Location: ../pages/faculty-login.php'); exit;
 }
 
-if (!$row['is_verified']) {
-    $_SESSION['login_error'] = 'Please verify your email first. Check your inbox for the verification code.';
-    header('Location: ../pages/faculty-login.php'); exit;
-}
-
-if ($row['approved_by'] === null) {
+if ((int)$row['is_verified'] !== 1 || $row['approved_by'] === null) {
     $_SESSION['login_error'] = 'Your account is pending approval from an Administrator.';
     header('Location: ../pages/faculty-login.php'); exit;
 }
@@ -55,7 +51,19 @@ $_SESSION['faculty_logged_in'] = true;
 $_SESSION['role']              = 'faculty';
 $_SESSION['faculty_attempts']  = 0;
 
+// ── NEW AUTHENTICATION QUERY: Check if user is Department Head ───
 $faculty_id = (int)$row['id'];
+$check_head_query = "SELECT EXISTS(SELECT 1 FROM departments WHERE head_faculty_id = ?) AS is_head";
+$stmt_head = $conn->prepare($check_head_query);
+$stmt_head->bind_param("i", $faculty_id);
+$stmt_head->execute();
+$head_result = $stmt_head->get_result()->fetch_assoc();
+$stmt_head->close();
+
+// Save the true/false flag in the session state
+$_SESSION['is_head'] = (bool)$head_result['is_head'];
+// ─────────────────────────────────────────────────────────────────
+
 $now_time   = date('H:i:s');
 $now_day    = date('l');
 
@@ -78,19 +86,9 @@ if ($sched) {
         UPDATE classrooms
         SET light_status = 'on',
             row1_status  = 'on',
-            row2_status  = 'on',
-            row3_status  = 'on',
-            pir_occupied = 1,
-            pir_since    = NOW()
+            row2_status  = 'on'
         WHERE id = $cid
     ");
-    $stmt = $conn->prepare("
-        INSERT INTO lighting_logs (classroom_id, faculty_id, event_type, triggered_by)
-        VALUES (?, ?, 'on', 'login')
-    ");
-    $stmt->bind_param('ii', $cid, $faculty_id);
-    $stmt->execute();
-    $stmt->close();
 }
 
 header('Location: ../pages/faculty-home/faculty-home.php'); exit;

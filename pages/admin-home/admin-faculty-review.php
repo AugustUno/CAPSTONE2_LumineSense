@@ -54,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         log_admin_action($conn, $admin_id, 'faculty_approved', $f_name, 'Faculty ID: ' . $generated_faculty_id);
         $message = 'approved';
-
     } elseif ($action === 'reject') {
         $stmt = $conn->prepare('DELETE FROM faculty WHERE id = ?');
         $stmt->bind_param('i', $faculty_id);
@@ -85,6 +84,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -102,7 +102,9 @@ $conn->close();
     <link rel="stylesheet" href="../../css/containers.css">
     <link rel="stylesheet" href="../../css/admin-common.css">
     <link rel="stylesheet" href="../../css/admin-faculty-review.css">
+    <link rel="stylesheet" href="../../css/tooltip.css">
 </head>
+
 <body class="contrast-bg">
     <?php include '../../php/includes/admin-topbar.php'; ?>
 
@@ -115,7 +117,7 @@ $conn->close();
             <div class="container d-flex align-items-center justify-content-center">
                 <div class="mb-3">
                     <button onclick="dissolve('admin-faculty-management.php')"
-                       class="light w-auto">
+                        class="light w-auto">
                         <i class="bi bi-arrow-left me-1"></i> Back to Faculty Management
                     </button>
                 </div>
@@ -132,8 +134,8 @@ $conn->close();
                 <div class="review-header d-flex justify-content-between align-items-center">
                     <div>
                         <h2 class="mb-0 fw-bold">
-                            <?= htmlspecialchars($faculty['first_name'] . ' ' . 
-                                ($faculty['middle_initial'] ? $faculty['middle_initial'] . '. ' : '') . 
+                            <?= htmlspecialchars($faculty['first_name'] . ' ' .
+                                ($faculty['middle_initial'] ? $faculty['middle_initial'] . '. ' : '') .
                                 $faculty['last_name']) ?>
                         </h2>
                         <small class="text-white-50"><?= htmlspecialchars($faculty['email']) ?></small>
@@ -160,8 +162,8 @@ $conn->close();
                             <div class="id-image-box">
                                 <?php if (!empty($faculty['id_image'])): ?>
                                     <img src="../../<?= htmlspecialchars($faculty['id_image']) ?>"
-                                         alt="Faculty ID"
-                                         onclick="openImageModal(this.src)">
+                                        alt="Faculty ID"
+                                        onclick="openImageModal(this.src)">
                                 <?php else: ?>
                                     <p class="text-muted small">No ID image uploaded.</p>
                                 <?php endif; ?>
@@ -192,12 +194,12 @@ $conn->close();
                                     </span>
                                 </div>
                                 <?php if ($faculty['faculty_id']): ?>
-                                <div class="info-row">
-                                    <span class="info-label">Faculty ID</span>
-                                    <span class="info-value text-primary">
-                                        <?= htmlspecialchars($faculty['faculty_id']) ?>
-                                    </span>
-                                </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Faculty ID</span>
+                                        <span class="info-value text-primary">
+                                            <?= htmlspecialchars($faculty['faculty_id']) ?>
+                                        </span>
+                                    </div>
                                 <?php endif; ?>
                             </div>
 
@@ -206,17 +208,17 @@ $conn->close();
                             <div class="mb-3">
                                 <?php
                                 $status = $faculty['ai_match_status'] ?? 'unreadable';
-                                $badge_class = match($status) {
+                                $badge_class = match ($status) {
                                     'matched'    => 'ai-matched',
                                     'mismatched' => 'ai-mismatched',
                                     default      => 'ai-unreadable'
                                 };
-                                $badge_icon = match($status) {
+                                $badge_icon = match ($status) {
                                     'matched'    => '✅',
                                     'mismatched' => '⚠️',
                                     default      => '❌'
                                 };
-                                $badge_text = match($status) {
+                                $badge_text = match ($status) {
                                     'matched'    => 'Name Matched',
                                     'mismatched' => 'Name Mismatch',
                                     default      => 'Unreadable ID'
@@ -248,17 +250,22 @@ $conn->close();
                                 <div class="d-flex gap-2 mt-3">
                                     <form method="POST" class="mb-0">
                                         <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="btn btn-success px-4">
+                                        <button type="submit"
+                                            class="btn btn-success px-4 w-auto"
+                                            title="Approve Faculty"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="auto">
                                             <i class="bi bi-check-lg me-1"></i> Approve
                                         </button>
                                     </form>
-                                    <form method="POST" class="mb-0"
-                                          onsubmit="return confirm('Reject and permanently delete this faculty record?')">
-                                        <input type="hidden" name="action" value="reject">
-                                        <button type="submit" class="btn btn-outline-danger px-4">
-                                            <i class="bi bi-x-lg me-1"></i> Reject
-                                        </button>
-                                    </form>
+                                    <button type="submit"
+                                        class="btn btn-outline-danger px-4 w-auto"
+                                        title="Reject Faculty"
+                                        onclick="openRejectModal()"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="auto">
+                                        <i class="bi bi-x-lg me-1"></i> Reject
+                                    </button>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -274,19 +281,53 @@ $conn->close();
         <img id="imgModalSrc" src="" style="max-width:90vw; max-height:90vh; border-radius:8px;">
     </div>
 
+    <!-- Reject Faculty Warning Modal -->
+    <div class="modal fade" id="rejectFacultyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header modal-header-warning">
+                    <h5 class="modal-title">Reject Faculty</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-exclamation-triangle" style="font-size:2.5rem;color:#c0392b;"></i>
+                    <p class="mt-3 mb-0" style="font-size:15px;">
+                        Are you sure you want to reject <strong><?= htmlspecialchars($faculty['first_name'] . ' ' . $faculty['last_name']) ?></strong>?
+                        This will permanently delete this faculty record.
+                    </p>
+                </div>
+                <form method="POST" action="">
+                    <input type="hidden" name="action" value="reject">
+                    <div class="modal-footer d-flex flex-nowrap flex-row justify-content-between gap-2">
+                        <button type="button" class="light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="medium" style="background:#c0392b;">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <?php include '../../php/includes/profile-offcanvas.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../script/animations.js"></script>
     <script src="../../script/toggles.js"></script>
+    <script src="../../script/tooltip.js"></script>
+
     <script>
         function openImageModal(src) {
             document.getElementById('imgModalSrc').src = src;
             document.getElementById('imgModal').style.display = 'flex';
         }
+
         function closeImageModal() {
             document.getElementById('imgModal').style.display = 'none';
         }
+
+        function openRejectModal() {
+            new bootstrap.Modal(document.getElementById('rejectFacultyModal')).show();
+        }
     </script>
 </body>
+
 </html>

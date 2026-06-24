@@ -150,23 +150,45 @@ $conn->close();
                                         <span class="department-info-label">Head:</span>
                                         <span class="department-info-val bold">
                                             <?php
-                                            $head_name = 'None assigned';
-                                            if (!empty($dept['head_faculty_id']) && !empty($faculty_list)) {
-                                                foreach ($faculty_list as $f) {
-                                                    if ($f['id'] == $dept['head_faculty_id']) {
-                                                        $head_name = htmlspecialchars($f['first_name'] . ' ' . $f['last_name']);
-                                                        break;
-                                                    }
+                                            // head_faculty_id sits on departments (FK → faculty.id ON DELETE SET NULL).
+                                            // The handler JOINs faculty, so head_first_name / head_last_name are
+                                            // already in $dept — use them directly without touching $all_faculty_map.
+                                            // Fallback to the map in case the handler hasn't been updated yet.
+                                            if (!empty($dept['head_faculty_id'])) {
+                                                if (!empty($dept['head_first_name'])) {
+                                                    // Fast path: name came from the JOIN in admin-handlers.php
+                                                    echo htmlspecialchars($dept['head_first_name'] . ' ' . $dept['head_last_name']);
+                                                } elseif (!empty($all_faculty_map[(int)$dept['head_faculty_id']])) {
+                                                    // Fallback: full row stored in map has first_name / last_name
+                                                    $h = $all_faculty_map[(int)$dept['head_faculty_id']];
+                                                    echo htmlspecialchars($h['first_name'] . ' ' . $h['last_name']);
+                                                } else {
+                                                    echo 'None assigned';
                                                 }
+                                            } else {
+                                                echo 'None assigned';
                                             }
-                                            echo $head_name;
                                             ?>
                                         </span>
                                     </div>
                                     <div class="department-info-row">
                                         <i class="bi bi-people"></i>
                                         <span class="department-info-label">Number of faculty:</span>
-                                        <span class="department-info-val bold"><?= isset($dept['faculty_count']) ? $dept['faculty_count'] : 'â€”' ?></span>
+                                        <span class="department-info-val bold">
+                                            <?php
+                                            // Count all faculty whose department_id matches this department.
+                                            // This includes the head of department if they also belong to this dept.
+                                            $faculty_count = 0;
+                                            if (!empty($faculty_list)) {
+                                                foreach ($faculty_list as $f) {
+                                                    if (isset($f['department_id']) && (int)$f['department_id'] === (int)$dept['id']) {
+                                                        $faculty_count++;
+                                                    }
+                                                }
+                                            }
+                                            echo $faculty_count > 0 ? $faculty_count : '—';
+                                            ?>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -315,8 +337,8 @@ $conn->close();
                                                     <span class="badge bg-info text-dark">+<?= $ext['extend_mins'] ?> mins</span>
                                                 </div>
                                                 <p class="text-secondary small mb-2">
-                                                    <?= $ext['room_name'] ?> Â· <?= $ext['day_of_week'] ?> Â·
-                                                    <?= date('g:i A', strtotime($ext['start_time'])) ?> â€“
+                                                    <?= $ext['room_name'] ?> · <?= $ext['day_of_week'] ?> ·
+                                                    <?= date('g:i A', strtotime($ext['start_time'])) ?> –
                                                     <?= date('g:i A', strtotime($ext['end_time'])) ?>
                                                 </p>
                                                 <div class="d-flex gap-2 justify-content-end">
@@ -349,7 +371,7 @@ $conn->close();
 
     <?php include '../../php/includes/profile-offcanvas.php'; ?>
 
-    <!-- â•â•â• DELETE FACULTY MODAL â•â•â• -->
+    <!-- ═══ DELETE FACULTY MODAL ═══ -->
     <div class="modal fade" id="deleteFacultyModal" tabindex="-1" aria-hidden="true">
         <div class="room-details-modal modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
@@ -376,7 +398,7 @@ $conn->close();
         </div>
     </div>
 
-    <!-- â•â•â• DELETE DEPARTMENT MODAL â•â•â• -->
+    <!-- ═══ DELETE DEPARTMENT MODAL ═══ -->
     <div class="modal fade" id="deleteDepartmentModal" tabindex="-1" aria-hidden="true">
         <div class="room-details-modal modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
@@ -403,7 +425,7 @@ $conn->close();
         </div>
     </div>
 
-    <!-- â•â•â• ADD DEPARTMENT MODAL â•â•â• -->
+    <!-- ═══ ADD DEPARTMENT MODAL ═══ -->
     <div class="modal fade" id="addDepartmentModal" tabindex="-1" aria-hidden="true">
         <div class="room-details-modal modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -473,7 +495,7 @@ $conn->close();
         </div>
     </div>
 
-    <!-- â•â•â• EDIT DEPARTMENT MODAL â•â•â• -->
+    <!-- ═══ EDIT DEPARTMENT MODAL ═══ -->
     <div class="modal fade" id="editDepartmentModal" tabindex="-1" aria-hidden="true">
         <div class="room-details-modal modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -544,7 +566,7 @@ $conn->close();
         </div>
     </div>
 
-    <!-- â•â•â• VIEW DEPARTMENT MODAL â•â•â• -->
+    <!-- ═══ VIEW DEPARTMENT MODAL ═══ -->
     <div class="modal fade" id="viewDepartmentModal" tabindex="-1" aria-hidden="true">
         <div class="room-details-modal modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -591,21 +613,35 @@ $conn->close();
 
     <!-- Faculty data for JS usage -->
     <script>
-        const allFaculty = <?= json_encode(array_map(function($f) {
+        // All faculty (all statuses) so the View modal can resolve the head name
+        // even if they are pending/unverified. department_id drives deptMembers.
+        const allFaculty = <?= json_encode(array_values(array_map(function($f) {
             return [
-                'id' => $f['id'],
-                'name' => $f['first_name'] . ' ' . $f['last_name'],
-                'email' => $f['email'],
-                'status' => $f['status_label']
+                'id'            => (int)$f['id'],
+                'name'          => $f['first_name'] . ' ' . $f['last_name'],
+                'email'         => $f['email'],
+                'status'        => $f['status_label'],
+                'department_id' => isset($f['department_id']) ? (int)$f['department_id'] : null
             ];
-        }, array_filter($faculty_list, function($f) { return $f['status_label'] === 'approved'; }))) ?>;
+        }, $faculty_list))) ?>;
 
-        // Department members map (dept_id => [faculty_ids]) â€” populate from your DB query in handler
-        const deptMembers = <?= isset($dept_members_map) ? json_encode($dept_members_map) : '{}' ?>;
+        /**
+         * Build deptMembers from faculty.department_id.
+         * department_id is the FK on the faculty table linking them to a dept.
+         * head_faculty_id is the FK on departments linking the head — handled separately.
+         * Shape: { dept_id: [faculty_id, ...] }
+         */
+        const deptMembers = allFaculty.reduce((map, f) => {
+            if (f.department_id !== null) {
+                if (!map[f.department_id]) map[f.department_id] = [];
+                map[f.department_id].push(f.id);
+            }
+            return map;
+        }, {});
     </script>
 
     <script>
-        // --- Toast ---
+        // ── Toast ──
         document.addEventListener("DOMContentLoaded", function() {
             const toast = document.getElementById('toastMsg');
             if (toast && toast.classList.contains('show')) {
@@ -613,7 +649,7 @@ $conn->close();
             }
         });
 
-        // --- Faculty List Filter ---
+        // ── Faculty List Filter ──
         function filterList(status) {
             const buttons = document.querySelectorAll('.btn-group button');
             buttons.forEach(btn => btn.classList.remove('medium'));
@@ -628,7 +664,7 @@ $conn->close();
             });
         }
 
-        // --- Search filter for faculty lists inside modals ---
+        // ── Search filter for faculty lists inside modals ──
         function filterFacultySearch(inputEl, listId) {
             const query = inputEl.value.toLowerCase().trim();
             const list = document.getElementById(listId);
@@ -640,21 +676,21 @@ $conn->close();
             });
         }
 
-        // --- DELETE FACULTY MODAL ---
+        // ── DELETE FACULTY MODAL ──
         function openDeleteFacultyModal(id, name) {
             document.getElementById('deleteFacultyId').value = id;
             document.getElementById('deleteFacultyName').textContent = name;
             new bootstrap.Modal(document.getElementById('deleteFacultyModal')).show();
         }
 
-        // --- DELETE DEPARTMENT MODAL ---
+        // ── DELETE DEPARTMENT MODAL ──
         function openDeleteDepartmentModal(id, name) {
             document.getElementById('deleteDepartmentId').value = id;
             document.getElementById('deleteDepartmentName').textContent = name;
             new bootstrap.Modal(document.getElementById('deleteDepartmentModal')).show();
         }
 
-        // --- ADD DEPARTMENT MODAL ---
+        // ── ADD DEPARTMENT MODAL ──
         function openAddDepartmentModal() {
             // Reset the form
             document.getElementById('addDepartmentModal').querySelectorAll('input[type=radio], input[type=checkbox]').forEach(el => el.checked = false);
@@ -664,7 +700,7 @@ $conn->close();
             new bootstrap.Modal(document.getElementById('addDepartmentModal')).show();
         }
 
-        // --- EDIT DEPARTMENT MODAL ---
+        // ── EDIT DEPARTMENT MODAL ──
         function openEditDepartmentModal(id, name, description, headFacultyId) {
             // Populate fields
             document.getElementById('editDeptId').value = id;
@@ -694,7 +730,7 @@ $conn->close();
             new bootstrap.Modal(document.getElementById('editDepartmentModal')).show();
         }
 
-        // --- VIEW DEPARTMENT MODAL ---
+        // ── VIEW DEPARTMENT MODAL ──
         function openViewDepartmentModal(id, name, description, headFacultyId) {
             document.getElementById('viewDeptTitle').textContent = name;
             document.getElementById('viewDeptDescription').textContent = description || 'No description provided.';
